@@ -78,12 +78,11 @@ export async function watchInputs(root, select, requiredIgnoredInputs = []) {
         const absolute = join(root, directory);
 
         try {
-            if (!fs.statSync(absolute).isDirectory()) {
-                errors.push('A declared input directory is unavailable.');
-                return;
-            }
+            // A migration can replace a tracked directory with a file. Its parent
+            // still observes changes to that path and the removed descendants.
+            if (!fs.statSync(absolute).isDirectory()) return;
         } catch (error) {
-            if (error.code !== 'ENOENT') errors.push('Could not inspect a declared input directory.');
+            if (!['ENOENT', 'ENOTDIR'].includes(error.code)) errors.push('Could not inspect a declared input directory.');
             return;
         }
 

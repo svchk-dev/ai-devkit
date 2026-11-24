@@ -1,4 +1,5 @@
 import { test } from 'node:test';
+import { execFileSync } from 'node:child_process';
 import assert from 'node:assert/strict';
 import { mkdtempSync, writeFileSync, readFileSync, readdirSync, mkdirSync, symlinkSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -6,6 +7,7 @@ import { join } from 'node:path';
 import { readAdapter } from '../../agent-runtime/adapter.mjs';
 import { selectsInput, isCodePath } from '../../agent-runtime/checks.mjs';
 import { fileIdentity } from '../../agent-runtime/repository.mjs';
+import { watchInputs } from '../../agent-runtime/watch.mjs';
 import { projectContext } from '../../agent-runtime/context.mjs';
 import { synchronize, toolkitRoot } from '../../agent-runtime/resources.mjs';
 
@@ -88,6 +90,36 @@ test('single-file policy and OpenSpec images affect the applicable check receipt
         assert.equal(selectsInput('docs', '.devkit', root), true);
         assert.equal(selectsInput('docs', 'openspec/changes/test/screenshots/current.png', root), true);
     } finally {
+        rmSync(root, { recursive: true, force: true });
+    }
+});
+
+test('verification observes a new adapter over tracked legacy snapshot paths', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'devkit indexed snapshot '));
+    let watcher;
+
+    try {
+        const git = (...args) => execFileSync('git', args, { cwd: root });
+        const path = join(root, '.devkit');
+
+        git('init', '--quiet');
+        mkdirSync(join(path, 'standards'), { recursive: true });
+        writeFileSync(join(path, 'standards/index.md'), '# Legacy snapshot\n');
+        git('add', '.devkit');
+        rmSync(path, { recursive: true });
+        writeFileSync(path, '{"schemaVersion":1}\n');
+
+        watcher = await watchInputs(root, () => true);
+        assert.equal((await watcher.outcome()).complete, true);
+
+        writeFileSync(path, '{"schemaVersion":1,"namespace":"Example"}\n');
+        await new Promise((resolve) => setTimeout(resolve, 30));
+
+        const observed = await watcher.outcome();
+        assert.equal(observed.complete, true);
+        assert.ok(observed.changedPaths.includes('.devkit'));
+    } finally {
+        watcher?.close();
         rmSync(root, { recursive: true, force: true });
     }
 });
