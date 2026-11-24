@@ -7,6 +7,20 @@
     "$schema": {
       "type": "string"
     },
+    "toolkit": {
+      "description": "Installed toolkit metadata maintained by sync.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "reference", "sourceIdentity", "standards", "skills"],
+      "properties": {
+        "version": { "type": "string" },
+        "reference": { "type": ["string", "null"] },
+        "sourceIdentity": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "standards": { "$ref": "#/$defs/path" },
+        "skills": { "$ref": "#/$defs/path" },
+        "hooks": { "$ref": "#/$defs/path" }
+      }
+    },
     "schemaVersion": {
       "const": 1
     },

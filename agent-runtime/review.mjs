@@ -10,7 +10,7 @@ import { activeTask, mutateState } from './state.mjs';
 import { ownsPath } from './tasks.mjs';
 
 function isRule(path, task) {
-    return path === 'devkit.json' || path.startsWith('.devkit/') || path === 'AGENTS.md' || path.startsWith('.ai/') || path.startsWith('.codex/')
+    return path === '.devkit' || path === 'devkit.json' || path.startsWith('.devkit/') || path === 'AGENTS.md' || path.startsWith('.ai/') || path.startsWith('.codex/')
         || path.startsWith('scripts/agent-hooks/') || path.startsWith('tooling/')
         || path.startsWith('docs/') || path.startsWith('openspec/specs/')
         || (task.change && path.startsWith(`openspec/changes/${task.change}/`) && !/(?:^|\/)(?:tasks|evidence)\.md$/u.test(path))

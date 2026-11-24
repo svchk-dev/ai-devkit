@@ -7,8 +7,25 @@ use Symfony\Component\Process\Process;
 $toolkitRoot = dirname(__DIR__);
 $repositoryRoot = realpath(getcwd());
 
-if ($repositoryRoot === false || !is_file($repositoryRoot . '/devkit.json')) {
-    fwrite(STDERR, "Run from a consumer with devkit.json.\n");
+if ($repositoryRoot === false) {
+    fwrite(STDERR, "Run from the consumer project root.\n");
+    exit(2);
+}
+
+$singleAdapter = $repositoryRoot . '/.devkit';
+$legacyAdapter = $repositoryRoot . '/devkit.json';
+
+if (is_link($singleAdapter) || (is_file($singleAdapter) && is_file($legacyAdapter))) {
+    fwrite(STDERR, "Select one regular .devkit or legacy devkit.json adapter.\n");
+    exit(2);
+}
+
+$adapterPath = realpath(is_file($singleAdapter) ? $singleAdapter : $legacyAdapter);
+
+if ($adapterPath === false || !is_file($adapterPath)
+    || !str_starts_with($adapterPath, $repositoryRoot . '/')
+    || in_array('.git', explode('/', substr($adapterPath, strlen($repositoryRoot) + 1)), true)) {
+    fwrite(STDERR, "Run from a consumer with .devkit or devkit.json.\n");
     exit(2);
 }
 
@@ -19,7 +36,7 @@ if (!is_file($repositoryRoot . '/vendor/autoload.php')) {
 
 require $repositoryRoot . '/vendor/autoload.php';
 
-$adapter = json_decode(file_get_contents($repositoryRoot . '/devkit.json'), true, flags: JSON_THROW_ON_ERROR);
+$adapter = json_decode(file_get_contents($adapterPath), true, flags: JSON_THROW_ON_ERROR);
 $stateDirectory = $adapter['stateDirectory'] ?? 'tmp/devkit';
 
 if (!is_string($stateDirectory) || $stateDirectory === '' || str_starts_with($stateDirectory, '/') || preg_match('~(?:^|/)(?:\\.\\.|\\.git)(?:/|$)~', $stateDirectory) === 1) {
@@ -53,7 +70,8 @@ if (in_array('.git', explode('/', substr($resolvedParent, strlen($repositoryRoot
 }
 
 $options = getopt('', ['path:']);
-$requestedPaths = (array) ($options['path'] ?? ($adapter['sourceRoots'] ?? ['app']));
+$defaultSourceRoot = in_array('laravel-package', $adapter['profiles'] ?? [], true) ? 'src' : 'app';
+$requestedPaths = (array) ($options['path'] ?? ($adapter['sourceRoots'] ?? [$defaultSourceRoot]));
 $baseline = [];
 $scopeFile = getenv($adapter['environment']['scopeVariable'] ?? 'DEVKIT_AGENT_SCOPE_FILE');
 

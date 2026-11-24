@@ -1,45 +1,51 @@
 # Consumer adapter and resources
 
-Install the toolkit directly in root development dependencies and create a
-devkit.json file with [schemaVersion 1](../config/adapter.schema.json), selected profiles, namespace, sourceRoots,
-architecture and check command argv arrays. No installation changes project
-instructions or grants trust automatically.
+Run `vendor/bin/devkit.mjs sync` at the Composer project root. The single
+`.devkit` file is a JSON adapter using [schemaVersion 1](../config/adapter.schema.json).
+Edit the file for project-owned settings, such as source roots, namespace,
+architecture, check commands and optional profiles. The `toolkit` section is
+maintained by sync and describes the executing package. It is informational;
+put intentional overrides in the other adapter settings.
 
-Select laravel-application (default source root app) or laravel-package (src).
-The package profile requires installed Testbench; applications do not. Optional
-filament, openspec and codex integrations are explicit. Common standards are
-always available. Prerequisites are checked before resource preparation.
+The defaults use the App namespace, the app source root and the shared area
+architecture. Select laravel-package to default to src and require Testbench.
+Optional filament, openspec and codex integrations are explicit. The
+laravel-application profile validates the installed Laravel dependency.
 
-The default architecture mode is areas. Additional named areas can be supplied
-through architecture.additionalAreas. An alternative uses mode custom, rules
-pointing to existing local documentation and command as a nonempty argv array
-for its actual verification. This overrides architecture, not unrelated standards.
+Additional named areas can be supplied through architecture.additionalAreas.
+An alternative uses mode custom, rules pointing to existing local documentation
+and command as a nonempty argv array for its verification.
 
-Run vendor/bin/devkit.mjs doctor, then vendor/bin/devkit.mjs sync explicitly.
-Reference .devkit/instructions.md from the consumer's own AGENTS.md entry point.
-Use sync --check for read-only freshness verification and remove to delete only
-unchanged owned output. Conflicting owners or local edits fail before replacement.
+Use doctor to validate configuration and prerequisites. Use sync --check to
+verify the selected toolkit without writing. Point contributors to the
+installed standards index through the project's existing agent entry point
+or optional Boost discovery. The toolkit does not create agent entry points.
 
-The tracked root devkit.resources.json manifest records source and adapter
-identity, output directory and last-written hashes. Common documents and
-effective Pint configuration live under .devkit by default; resourceDirectory
-can select another contained directory. Updates can relocate owned resources,
-preserving local additions. No dependency package Composer script runs this step.
+Projects with a root devkit.json keep the legacy managed output and
+devkit.resources.json ownership manifest. The optional resourceDirectory
+setting applies to that layout only. See the [migration guide](usage.md#migrate-a-legacy-snapshot)
+to move to the single-file adapter.
 
-quality.pint supplies explicit local settings/exclusions; its rules merge over
-shared defaults. Document intentional exceptions locally. Paths must remain
+In legacy snapshot mode, quality.pint supplies explicit local settings and
+exclusions merged over shared defaults. Document intentional exceptions locally. Paths must remain
 inside the repository after symlink resolution; commands are argv, not shell
 fragments. Failed writes restore previous files or report precise recovery paths.
 Operational state is separate and must be ignored; neither state nor manifests
 contain credentials or full transcripts.
 
-The ownership manifest also records the executing Composer selection when its
+The legacy ownership manifest also records the executing Composer selection when its
 installed path matches the toolkit being run. Direct source execution is labelled
 development; a content digest is still recorded. The schema describes structure;
 runtime validation additionally checks symlinks, installed prerequisites and
 cross-field requirements.
 
-The generated phpstan.neon includes shared type settings and convention rules.
+Single-file setups can use the [installed Pint preset](../config/pint.json)
+and include the [installed PHPStan defaults](../config/phpstan.neon) and
+[convention rules](../config/conventions.neon) from their existing configurations.
+They can run the installed `bin/conventions.php` with the active adapter settings.
+Keep command-specific Pint and PHPStan overrides in project configurations
+when using the single-file adapter. Legacy snapshots can generate effective
+configuration using the adapter's `quality` options.
 quality.phpstan can select level, bootstrapFiles and excludePaths. The consumer
 can include this file from its own Larastan configuration and retain its host
 bootstrap. Pint uses an effective JSON configuration; it has no native inheritance.
@@ -54,8 +60,10 @@ names and business responsibility still require review. See
 [Deptrac configuration](https://deptrac.github.io/deptrac/configuration/) and
 [collectors](https://deptrac.github.io/deptrac/collectors/).
 
-The codex profile prepares templates under the managed resource directory.
-Activation is a separate local integration step: review/merge the hook definitions
+The codex profile references the installed hook template from the managed
+metadata in `.devkit`. Legacy snapshots copy the templates to their managed
+directory. Activation is a separate local integration step. Review and merge
+the hook definitions
 into the consumer's own .codex/hooks.json, configure its project_reviewer role
 from the template and preserve local policy. Those local launchers remain
 consumer-owned; sync never overwrites them or grants trust. Use the client's

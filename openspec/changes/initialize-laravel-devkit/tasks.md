@@ -49,6 +49,11 @@
 - [x] 6.4 Make maintainer versioning discoverable for every agent-assisted AI Devkit push; document changelog, version selection, branch-only scope and exact-candidate gates without adding the repository's release policy to consumer instructions or skill discovery.
 - [x] 6.5 Rehearse compatible, additive, breaking, maintenance-only, branch-only and blocked release decisions; verify annotated tag identity and collision handling with a disposable Git remote.
 
+## 7. Support a single-file setup
+
+- [ ] 7.1 Generate and refresh one `.devkit` file, preserving local settings while referencing installed resources. Verify a clean install, an update, an unchanged repeat and legacy adapter compatibility.
+- [ ] 7.2 Document single-file setup, optional profile activation and the migration from legacy snapshots. Verify the independent consumer and obtain independent review.
+
 ## Workflow follow-up
 
 - Confirm public package/repository identity and license before public metadata or distribution; create no remote, tag or package registration without explicit authorization.

@@ -1,8 +1,8 @@
 import { createHash, randomUUID } from 'node:crypto';
-import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, renameSync, rmSync, lstatSync, realpathSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, renameSync, linkSync, rmSync, lstatSync, realpathSync } from 'node:fs';
 import { resolve, dirname, relative, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { readAdapter, containedPath, assertPrerequisites } from './adapter.mjs';
+import { adapterName, readAdapter, containedPath, assertPrerequisites } from './adapter.mjs';
 
 export const toolkitRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const hash = (content) => createHash('sha256').update(content).digest('hex');
@@ -196,7 +196,65 @@ function applyFiles(root, adapter, files, paths, manifest) {
     } finally { rmSync(staging, { recursive: true, force: true }); }
 }
 
+function syncAdapterFile(root, name, { remove, check }) {
+    if (remove) throw new Error('The .devkit configuration is project-owned. Remove it explicitly after reviewing its local settings.');
+    if (existsSync(containedPath(root, manifestName))) throw new Error('Remove the legacy resource snapshot before creating .devkit.');
+    if (!existsSync(containedPath(root, 'composer.json'))) throw new Error('Run sync from the root of your Composer project.');
+
+    const target = containedPath(root, '.devkit');
+    const prior = name ? readFileSync(target, 'utf8') : null;
+    const adapter = prior === null ? null : readAdapter(root);
+
+    if (adapter) assertPrerequisites(root, adapter);
+
+    const policy = prior === null
+        ? { $schema: './vendor/svchk-dev/ai-devkit/config/adapter.schema.json', schemaVersion: 1 }
+        : JSON.parse(prior);
+    const packagePath = 'vendor/svchk-dev/ai-devkit/';
+    const sourceIdentity = toolkitIdentity();
+    const toolkit = {
+        ...toolkitSelection(root),
+        sourceIdentity,
+        standards: packagePath + 'standards/index.md',
+        skills: packagePath + 'resources/boost/skills/',
+    };
+
+    if (adapter?.profiles.includes('codex')) toolkit.hooks = packagePath + 'adapters/codex/hooks.json';
+
+    const changed = JSON.stringify(policy.toolkit) !== JSON.stringify(toolkit);
+
+    if (!changed) return { changed: false, files: 1, sourceIdentity };
+    if (check) throw new Error('The .devkit file is missing or its toolkit metadata is stale. Run vendor/bin/devkit.mjs sync.');
+
+    const content = JSON.stringify({ ...policy, toolkit }, null, 4) + '\n';
+
+    const staging = containedPath(root, '.devkit-' + randomUUID() + '.tmp');
+    const mode = prior === null ? 0o666 : lstatSync(target).mode & 0o777;
+
+    try {
+        writeFileSync(staging, content, { flag: 'wx', mode });
+
+        if (prior === null) {
+            linkSync(staging, target);
+        } else {
+            if (adapterName(root) !== '.devkit' || readFileSync(target, 'utf8') !== prior) {
+                throw new Error('The .devkit file changed during sync. Run sync again.');
+            }
+
+            renameSync(staging, target);
+        }
+    } finally {
+        rmSync(staging, { force: true });
+    }
+
+    return { changed: true, files: 1, sourceIdentity };
+}
+
 export function synchronize(root, { remove = false, check = false } = {}) {
+    const name = adapterName(root);
+
+    if (name !== 'devkit.json') return syncAdapterFile(root, name, { remove, check });
+
     const adapter = readAdapter(root);
 
     if (!remove) assertPrerequisites(root, adapter);

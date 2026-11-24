@@ -4,8 +4,8 @@
 
 # Shared development toolkit
 
-This project explicitly selects versioned engineering standards from AI Devkit. Read its local AGENTS.md entry point, devkit.json policy and prepared
-.devkit/instructions.md (or the configured resourceDirectory).
+This project explicitly selects versioned engineering standards from AI Devkit. Read local AGENTS.md, the .devkit policy (or legacy devkit.json)
+and vendor/svchk-dev/ai-devkit/standards/index.md.
 
 Use shared standards with explicit local rules. The default Main/Admin/Web/Console/Api
 layout describes consuming applications/packages; respect documented overrides.

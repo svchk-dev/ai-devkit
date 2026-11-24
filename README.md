@@ -44,7 +44,7 @@ The toolkit owns reusable engineering practices. A consuming project owns its
 AGENTS.md, product specifications, authorization rules, deployment configuration,
 release policy and any documented exceptions.
 
-An explicit **devkit.json** adapter supplies the project's namespace, source
+The **.devkit** adapter can supply the project's namespace, source
 roots, selected integrations, check commands, reference documents and reviewer
 additions. It connects the shared tools to that project's actual environment.
 Installation does not grant an agent permission to publish, deploy or change
@@ -120,53 +120,29 @@ separate adapters; support for them is not currently claimed.
 
 ## How adoption works
 
-Install a compatible published version as a root Composer development dependency
-and commit the resolved lockfile. For a direct install of the 0.1 series from the
-public GitHub repository, run:
+Install from Packagist as a root Composer development dependency, then run sync
+from the project root:
 
 ```sh
-composer config repositories.ai-devkit vcs https://github.com/svchk-dev/ai-devkit
-composer require --dev svchk-dev/ai-devkit:^0.1
-```
-
-When the package is available in your configured Composer registry, Composer
-can resolve it by name from that registry.
-
-Selected ecosystem tools remain explicit project dependencies. Resource
-preparation runs through the separate commands below.
-
-With development dependencies installed, create a project-owned devkit.json:
-
-```json
-{
-  "schemaVersion": 1,
-  "profiles": ["laravel-application"],
-  "namespace": "App",
-  "sourceRoots": ["app"],
-  "architecture": {
-    "mode": "areas"
-  },
-  "references": ["AGENTS.md"]
-}
-```
-
-Prepare the selected resources explicitly:
-
-```sh
-vendor/bin/devkit.mjs doctor
+composer require --dev svchk-dev/ai-devkit
 vendor/bin/devkit.mjs sync
-vendor/bin/devkit.mjs sync --check
 ```
 
-Add a reference to .devkit/instructions.md in the project's AGENTS.md. Commit the
-managed resources and devkit.resources.json ownership manifest. Use the generated
-Pint/PHPStan configuration from project-owned commands. Configure check argv and
-verification profiles before using the agent workflow engine.
+Sync creates one project-owned JSON file named **.devkit**. Commit it with
+composer.json and composer.lock. It records the selected toolkit and points to
+shared standards and skills in the installed package. Edit the file to select
+optional integrations and record project settings. The installed version stays
+the canonical source for shared rules and tools.
 
-Refresh is explicit and fails on conflicting ownership or local edits to managed
-files. Removal deletes unchanged owned resources while preserving local additions.
+Run `vendor/bin/devkit.mjs sync` after installing or updating locked
+dependencies. It refreshes toolkit metadata and preserves local settings.
+Use `vendor/bin/devkit.mjs sync --check` to validate setup without writing.
+Composer installation does not run this command itself. Codex hook activation
+and trust are explicit client actions.
+
 See the [adapter guide](docs/adapter.md) for settings and
-[installation, update and recovery](docs/usage.md) for the adoption lifecycle.
+[installation, update and recovery](docs/usage.md) for the full workflow and
+migration from the earlier snapshot layout.
 
 Runtime-only installation requires no toolkit or agent process.
 

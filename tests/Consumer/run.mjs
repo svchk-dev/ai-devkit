@@ -250,6 +250,43 @@ function boostDiscovery(consumer) {
     php(directory, ['boost-probe.php']);
 }
 
+function singleFileTransition(consumer) {
+    const { directory } = consumer;
+    const legacy = join(directory, 'devkit.json');
+    const snapshot = join(directory, '.devkit');
+    const policy = JSON.parse(readFileSync(legacy, 'utf8'));
+
+    cli(directory, 'remove');
+    rmSync(snapshot, { recursive: true });
+    rmSync(legacy);
+    cli(directory, 'sync');
+    const created = JSON.parse(readFileSync(snapshot, 'utf8'));
+
+    assert.equal(created.toolkit.version, '0.1.0');
+    assert.equal(existsSync(join(directory, 'devkit.resources.json')), false);
+    write(directory, '.devkit', { ...created, ...policy });
+
+    const metadata = JSON.parse(readFileSync(join(directory, 'composer.json'), 'utf8'));
+    metadata['require-dev']['svchk-dev/ai-devkit'] = '0.2.0';
+    write(directory, 'composer.json', metadata);
+    composer(directory, ['update', 'svchk-dev/ai-devkit', '--prefer-dist']);
+    cli(directory, 'sync');
+    cli(directory, 'sync', '--check');
+    cli(directory, 'doctor');
+    cli(directory, 'architecture');
+    php(directory, ['vendor/svchk-dev/ai-devkit/bin/conventions.php']);
+    applicationRuntime(consumer);
+
+    const refreshed = JSON.parse(readFileSync(snapshot, 'utf8'));
+    assert.equal(refreshed.toolkit.version, '0.2.0');
+    assert.notEqual(refreshed.toolkit.sourceIdentity, created.toolkit.sourceIdentity);
+    assert.deepEqual(refreshed.architecture, policy.architecture);
+    assert.equal(readFileSync(join(directory, 'AGENTS.md'), 'utf8'), 'Local project rules remain local.\n');
+    assert.match(readFileSync(join(directory, refreshed.toolkit.standards), 'utf8'), /engineering standards/u);
+    assert.match(readFileSync(join(directory, 'vendor/svchk-dev/ai-devkit/standards/coding.md'), 'utf8'), /Synthetic update fixture/u);
+    results.push({ singleFileAdapter: true, versions: ['0.1.0', '0.2.0'], localPolicyPreserved: true });
+}
+
 function transition(consumer) {
     const { directory } = consumer;
     const originalMetadata = readFileSync(join(directory, 'composer.json'), 'utf8');
@@ -300,6 +337,7 @@ try {
     const alternative = install('native-application', { alternative: true });
     applicationRuntime(alternative);
     violations(alternative);
+    singleFileTransition(alternative);
     console.log('Installing and booting the independent package host.');
     const packageConsumer = install('package', { packageProfile: true });
     packageRuntime(packageConsumer);

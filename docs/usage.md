@@ -13,65 +13,60 @@ of the toolkit; Pint, Deptrac, optional Larastan/Boost, and a package's Testbenc
 host remain project decisions. See [development](development.md) for tested pins.
 Filament and OpenSpec are not prerequisites unless their profiles are selected.
 
-Create devkit.json and follow the [adapter guide](adapter.md). Run:
+From the project root, run:
 
 ```sh
-vendor/bin/devkit.mjs doctor
+composer require --dev svchk-dev/ai-devkit
 vendor/bin/devkit.mjs sync
-vendor/bin/devkit.mjs sync --check
+vendor/bin/devkit.mjs doctor
 ```
 
-Composer's vendor/bin entry is executable; do not pass that shell proxy to Node.
-Reference the prepared instructions from the consumer's own AGENTS.md. Review and
-commit managed output and its ownership manifest. Installations do not grant trust,
-modify application data or publish anything.
+Commit `.devkit` with the Composer manifest and lock. The file is JSON and
+holds both project settings and a `toolkit` section maintained by sync.
+Use the executable Composer proxy directly. Composer installs the dependency;
+the explicit sync command prepares its project settings. See the
+[Composer script lifecycle](https://getcomposer.org/doc/articles/scripts.md)
+and [adapter guide](adapter.md).
 
-## Update a selected version
+## Update or restore a selected version
 
-1. Save the current Composer manifest/lock and unchanged managed resource set in
-   the project's version control. Review the target's standards and adoption notes.
-2. Select a compatible released version in require-dev and resolve it with the
-   project's maintained Composer command. Review the resolved lock diff.
-3. Run vendor/bin/devkit.mjs sync, then sync --check. Review changed resources,
-   local exceptions and check commands. Rerun affected quality/consumer checks.
-4. Repeat actual client compatibility acceptance when the hook definition or
-   executing toolkit changes. A prior trust decision or synthetic test is not
-   fresh lifecycle evidence.
+1. Review the target version's change and select it in require-dev.
+2. Resolve and install it with the project's Composer command.
+3. Run `vendor/bin/devkit.mjs sync` and then
+   `vendor/bin/devkit.mjs sync --check`. Review the lock and toolkit metadata
+   diff and run affected checks.
 
-For saved-lock recovery, restore the saved composer.json and composer.lock, run
-the project's locked install, then synchronize with that selected toolkit.
-Keep the current ownership manifest and unchanged outputs together until sync
-replaces them; restoring only an old manifest over newer output causes a conflict.
-Alternatively restore the entire saved managed set and manifest as one consistent
-snapshot. Verify freshness and affected checks again. Preserve local rules,
-environment files, application storage and existing task evidence throughout.
+For recovery, restore the saved Composer manifest and lock, install from the
+lock and rerun sync. Shared guidance and tools follow the installed version.
+Sync preserves explicit local settings. Review and reapply changed hook
+definitions through the client's supported configuration and trust workflow.
 
-## Resolve resource conflicts
+## Migrate a legacy snapshot
 
-Sync and remove refuse locally edited managed files and foreign targets.
-Inspect the diff and the manifest's last-written ownership. Move intentional local
-policy to a consumer-owned document/adapter exception, restore the known managed
-output from the selected saved version, then retry. Do not delete ownership
-metadata to claim foreign files or edit vendor to bypass the conflict.
+Install the newer toolkit and save the legacy adapter, ownership manifest and
+managed resources together. With the legacy `devkit.json` still in place,
+run `vendor/bin/devkit.mjs remove` to remove unchanged owned output. Move
+any remaining local files out of the old `.devkit/` directory and remove the
+empty directory before creating the file at the same path.
 
-A failed staged update restores the prior usable files. If restoration itself
-fails, use the reported paths and the saved consistent resource set for manual
-recovery; do not report synchronization as successful.
+Rename `devkit.json` to `.devkit` and remove its `resourceDirectory` setting.
+Transfer any `quality` overrides to the project's Pint or PHPStan configuration
+and remove `quality` from the adapter before running sync. Update existing
+entry points that referenced snapshots to use installed resources or
+consumer-owned configurations.
+Preserve local exceptions, trusted-client settings and application data.
+
+Legacy projects can continue to sync their existing layout with the new toolkit.
+The legacy command reports conflicting ownership or edited files before
+replacement and retains previous resources on a failed staged update.
 
 ## Remove the integration
 
-Disable the consumer-owned hook launchers and remove references to shared config
-from project-owned commands. While the toolkit is still installed, run:
-
-```sh
-vendor/bin/devkit.mjs remove
-```
-
-Then remove its development dependency with the project's maintained Composer
-command and review the lock diff. Removal deletes unchanged owned resources,
-preserving local additions and files owned by other generators. Keep local task
-evidence until its review/recovery obligations are resolved; no application
-migration or database reset is involved.
+Disable any consumer-owned hooks and remove references to the toolkit from
+project commands. Review and remove the project-owned `.devkit` file, then
+remove the Composer development dependency. For a legacy snapshot, run the
+toolkit's `remove` command before removing the dependency. Preserve any local
+additions or task evidence still needed by the project.
 
 ## Recover agent state
 

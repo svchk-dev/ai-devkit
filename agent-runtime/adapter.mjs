@@ -45,13 +45,29 @@ export function command(value) {
     return value;
 }
 
+export function adapterName(root) {
+    const singleFile = containedPath(root, '.devkit');
+    const legacy = existsSync(containedPath(root, 'devkit.json'));
+
+    if (existsSync(singleFile)) {
+        const entry = lstatSync(singleFile);
+
+        if (legacy && entry.isDirectory()) return 'devkit.json';
+        if (!entry.isFile()) throw new Error('Expected a regular .devkit file. Follow the legacy migration guide if .devkit is a directory.');
+        if (legacy) throw new Error('Both .devkit and devkit.json exist. Retain one adapter.');
+        return '.devkit';
+    }
+
+    return legacy ? 'devkit.json' : null;
+}
+
 export function readAdapter(root) {
-    const path = containedPath(root, 'devkit.json');
+    const name = adapterName(root);
 
-    if (!existsSync(path)) throw new Error('Create devkit.json with selected profiles and local policy first.');
+    if (name === null) throw new Error('Run vendor/bin/devkit.mjs sync to create .devkit.');
 
-    const adapter = JSON.parse(readFileSync(path, 'utf8'));
-    const keys = ['$schema', 'schemaVersion', 'profiles', 'namespace', 'sourceRoots', 'architecture', 'quality', 'checks', 'verificationProfiles', 'references', 'inputSets', 'environment', 'reviewer', 'stateDirectory', 'resourceDirectory', 'specializedReferences', 'objectiveRuleIdentifiers', 'openspec'];
+    const adapter = JSON.parse(readFileSync(containedPath(root, name), 'utf8'));
+    const keys = ['$schema', 'schemaVersion', 'toolkit', 'profiles', 'namespace', 'sourceRoots', 'architecture', 'quality', 'checks', 'verificationProfiles', 'references', 'inputSets', 'environment', 'reviewer', 'stateDirectory', 'resourceDirectory', 'specializedReferences', 'objectiveRuleIdentifiers', 'openspec'];
 
     if (!adapter || Array.isArray(adapter) || adapter.schemaVersion !== 1 || Object.keys(adapter).some((key) => !keys.includes(key))) {
         throw new Error('Unsupported adapter schema or setting.');
@@ -88,9 +104,18 @@ export function readAdapter(root) {
     if (!Array.isArray(adapter.sourceRoots) || !adapter.sourceRoots.length) throw new Error('Supply source roots.');
     for (const name of adapter.sourceRoots) containedPath(root, name);
 
-    adapter.resourceDirectory ??= '.devkit';
+    if (name === 'devkit.json') {
+        adapter.resourceDirectory ??= '.devkit';
+        containedPath(root, adapter.resourceDirectory);
+    } else if (adapter.resourceDirectory !== undefined) {
+        throw new Error('The .devkit adapter reads shared resources from the installed package.');
+    }
+
+    if (name === '.devkit' && Object.keys(adapter.quality ?? {}).length) {
+        throw new Error('Move quality settings to the project Pint and PHPStan configurations before adopting .devkit.');
+    }
+
     adapter.stateDirectory ??= 'tmp/devkit';
-    containedPath(root, adapter.resourceDirectory);
     containedPath(root, adapter.stateDirectory);
     adapter.architecture ??= { mode: 'areas' };
 

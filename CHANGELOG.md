@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Add the single-file `.devkit` Composer setup. Explicit sync creates or
+  refreshes package metadata without overwriting local settings.
+- Read shared resources from the installed package in single-file mode.
+  Existing snapshot-based consumers remain supported.
+- Invalidate documentation receipts when OpenSpec screenshots or documentation
+  checker inputs change.
+
 ## v0.1.0 (2026-11-24)
 
 - Introduce shared Laravel coding standards, architecture defaults, optional

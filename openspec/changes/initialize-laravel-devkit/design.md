@@ -98,7 +98,14 @@ stricter feature relationships.
 
 ### 4. Keep a small consumer adapter and clear ownership
 
-Use a repository-local `devkit.json` with a documented schema for selected
+Use a single project-owned `.devkit` JSON file for new installations.
+`vendor/bin/devkit.mjs sync` creates it after Composer installation or refreshes
+its managed toolkit metadata after a dependency update. Keep local settings and
+optional profiles in the same file. Resolve shared resources from the installed
+package. The command preserves local settings and never activates Codex hooks.
+
+Continue to support the existing snapshot mode for projects with root
+`devkit.json`. That adapter uses the documented schema for selected
 profiles, source roots/namespace, architecture/override rule reference, command
 argv, standards map, required checks, relevant input sets, reviewer extensions
 and managed targets. Secrets and trust grants are not adapter settings.

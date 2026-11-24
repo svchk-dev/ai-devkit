@@ -94,6 +94,18 @@ managed files or regions. Conflicting ownership and locally edited managed outpu
 MUST be detected before replacement. Failed preparation MUST preserve the prior
 usable files and MUST NOT report successful synchronization.
 
+#### Scenario: Prepare a single-file installation
+
+- **WHEN** a project installs the toolkit and runs its explicit sync command with no legacy adapter
+- **THEN** the only generated project file is the `.devkit` JSON file
+- **AND** shared standards, skills and optional hook definitions remain in the installed toolkit
+
+#### Scenario: Refresh a single-file installation
+
+- **WHEN** the project updates the toolkit and runs sync again
+- **THEN** toolkit metadata is refreshed in `.devkit` while local settings are preserved
+- **AND** the toolkit does not activate or trust hook definitions automatically
+
 #### Scenario: Install or refresh twice
 
 - **WHEN** the same selected resources are prepared repeatedly without changed inputs
