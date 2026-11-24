@@ -9,6 +9,12 @@ export function ownsPath(task, path) {
     return task.paths.some((selected) => path === selected || path.startsWith(selected + '/'));
 }
 
+export function taskContainsCode(root, task, inputs) {
+    const codePaths = readAdapter(root).inputSets?.codePaths ?? [];
+
+    return inputs.files.some(([path]) => ownsPath(task, path) && isCodePath(path, codePaths));
+}
+
 export function phpFeedbackInputs(inputs, task) {
     return inputs.files.filter(([path]) => ownsPath(task, path) && path.endsWith('.php'))
         .map(([path, identity]) => [path, digest(identity)]);
@@ -63,7 +69,7 @@ export async function registerTask(root, sessionId, options) {
         failureSignature: null, lastHandoff: null,
         conventionBaseline: [],
     };
-    task.containsCode = inputs.files.some(([path]) => ownsPath(task, path) && isCodePath(path));
+    task.containsCode = taskContainsCode(root, task, inputs);
     task.feedbackPhpInputs = phpFeedbackInputs(inputs, task);
     requiredChecks(task, root);
 
@@ -108,7 +114,7 @@ export async function amendScope(root, sessionId, options) {
         if (!task) throw new Error('An active task is required.');
 
         const candidate = { ...task, mode: 'change', paths, profile: options.profile ?? task.profile };
-        candidate.containsCode = inputs.files.some(([path]) => ownsPath(candidate, path) && isCodePath(path));
+        candidate.containsCode = taskContainsCode(root, candidate, inputs);
         candidate.feedbackPhpInputs = phpFeedbackInputs(inputs, candidate);
         requiredChecks(candidate, root);
         Object.assign(task, candidate, {

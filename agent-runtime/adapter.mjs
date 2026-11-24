@@ -185,10 +185,17 @@ export function readAdapter(root) {
         }
     }
 
-    knownKeys(adapter.inputSets ?? {}, ['implementationGuidance'], 'inputSets');
+    knownKeys(adapter.inputSets ?? {}, ['implementationGuidance', 'codePaths'], 'inputSets');
 
-    if (adapter.inputSets?.implementationGuidance !== undefined && !Array.isArray(adapter.inputSets.implementationGuidance)) throw new Error('Guidance must be a path array.');
-    for (const name of adapter.inputSets?.implementationGuidance ?? []) containedPath(root, name);
+    for (const key of ['implementationGuidance', 'codePaths']) {
+        const paths = adapter.inputSets?.[key];
+
+        if (paths === undefined) continue;
+        if (!Array.isArray(paths)) throw new Error(`${key} must be a path array.`);
+        const resolved = paths.map((path) => containedPath(root, path));
+
+        if (key === 'codePaths') adapter.inputSets.codePaths = resolved.map((path) => relative(root, path).split(sep).join('/'));
+    }
 
     object(adapter.checks ?? {}, 'checks');
     object(adapter.verificationProfiles ?? {}, 'verificationProfiles');

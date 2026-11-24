@@ -73,6 +73,9 @@ Run the installed `agent-runtime/cli.mjs` directly for task registration, scope
 changes, declared checks, review preparation and checkpoints. Set `checks` and
 `verificationProfiles` in `.devkit` to describe the project's actual commands
 and required checks. These can invoke installed tools directly.
+List additional runtime paths in `inputSets.codePaths` when a project keeps
+code or interface assets outside the default source layout. A documentation
+task cannot cover those paths. Runtime receipts include their contents.
 Run agent-runtime/compatibility.mjs --inventory to inspect current client trust
 and observed coverage. Register the actual runtime session and do not manufacture
 lifecycle events. Unavailable hooks do not waive manual checks or review.

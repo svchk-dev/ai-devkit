@@ -5,11 +5,33 @@ import { mkdtempSync, writeFileSync, readFileSync, readdirSync, mkdirSync, symli
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { readAdapter } from '../../agent-runtime/adapter.mjs';
-import { selectsInput, isCodePath } from '../../agent-runtime/checks.mjs';
+import { selectsInput, isCodePath, requiredChecks } from '../../agent-runtime/checks.mjs';
 import { fileIdentity } from '../../agent-runtime/repository.mjs';
 import { watchInputs } from '../../agent-runtime/watch.mjs';
 import { projectContext } from '../../agent-runtime/context.mjs';
 import { synchronize, toolkitRoot } from '../../agent-runtime/resources.mjs';
+
+test('declared runtime asset paths are outside a documentation-only task', () => {
+    const root = mkdtempSync(join(tmpdir(), 'devkit runtime path '));
+
+    try {
+        writeFileSync(join(root, '.devkit'), JSON.stringify({
+            schemaVersion: 1,
+            inputSets: { codePaths: ['presentation/assets/'] },
+            checks: { docs: ['true'], full: ['true'] },
+            verificationProfiles: { docs: ['docs'], runtime: ['full'] },
+        }));
+
+        assert.deepEqual(requiredChecks({ profile: 'docs', paths: ['docs/guide.md'] }, root), ['docs']);
+        assert.throws(() => requiredChecks({ profile: 'docs', paths: ['presentation/assets/icon.svg'] }, root), /code scope/u);
+        assert.throws(() => requiredChecks({ profile: 'docs', paths: ['presentation'] }, root), /code scope/u);
+        assert.deepEqual(requiredChecks({ profile: 'runtime', paths: ['presentation/assets/icon.svg'] }, root), ['full']);
+        assert.equal(selectsInput('full', 'presentation/assets/fixture.md', root), true);
+        assert.equal(selectsInput('full', 'presentation/notes.md', root), false);
+    } finally {
+        rmSync(root, { recursive: true, force: true });
+    }
+});
 
 test('sync refreshes one adapter file while keeping project settings', () => {
     const root = mkdtempSync(join(tmpdir(), 'devkit single-file '));

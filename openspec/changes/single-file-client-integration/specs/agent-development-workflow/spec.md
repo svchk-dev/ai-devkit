@@ -24,3 +24,15 @@ Dispatch MUST require verified native project trust and toolkit identity.
 
 - **WHEN** a Codex event belongs to a project without the `codex` profile in `.devkit`
 - **THEN** the shared hook skips it without taking project actions
+
+### Requirement: Consumer-declared verification paths
+
+The toolkit SHALL accept additional executable or runtime asset paths from the
+consumer adapter. Documentation-only verification MUST reject scopes that cover
+these paths, and relevant runtime receipts MUST bind their contents.
+
+#### Scenario: Select an interface asset or its owning directory
+
+- **WHEN** a change scope intersects a consumer-declared code path
+- **THEN** the documentation-only profile is rejected even if the files use non-code extensions
+- **AND** runtime verification includes the selected path in its execution inputs

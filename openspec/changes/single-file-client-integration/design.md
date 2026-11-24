@@ -28,6 +28,13 @@ trust and lifecycle evidence only when observed. The shared reviewer template
 can be registered at user scope once. Core business guidance is declared by each
 project. The installer and sync do not edit Codex settings or grant trust.
 
+## Consumer verification paths
+
+Allow the root adapter to name additional code or runtime asset paths in
+`inputSets.codePaths`. Reject documentation-only verification for scopes that
+contain or intersect those paths. Include the configured paths in runtime
+check inputs regardless of their extensions. Each consumer owns those paths.
+
 ## Verification and recovery
 
 Exercise a consumer with only its Composer files and `.devkit`, including

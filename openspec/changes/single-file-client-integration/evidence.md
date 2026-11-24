@@ -37,3 +37,11 @@ source roots, reports native project trust separately from plugin hook trust,
 and directs task recovery through the installed CLI. The real Codex inventory
 confirmed active and inactive results for trusted and untrusted projects with
 the same seven approved plugin hooks.
+
+## Consumer verification paths
+
+Focused adapter and dispatcher tests passed after adding the optional
+`inputSets.codePaths` setting. They check a runtime asset, its parent scope and
+a runtime fixture with a Markdown extension, while an independent documentation
+scope retains its documentation-only profile. The paths in these checks are
+fixture data supplied through the consumer adapter.

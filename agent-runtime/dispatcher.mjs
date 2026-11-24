@@ -1,6 +1,5 @@
 import { pathToFileURL } from 'node:url';
 import { assessCompletion } from './completion.mjs';
-import { isCodePath } from './checks.mjs';
 import { installedClientIdentity } from './compatibility.mjs';
 import { projectContext } from './context.mjs';
 import { agentCommand, contextOutput, failureOutput, readEvent } from './protocol.mjs';
@@ -8,7 +7,7 @@ import { observeProposalPermission, proposalCreationTargets, proposalToolBlock, 
 import { coveragePolicyIdentity, repositoryRoot, snapshot } from './repository.mjs';
 import { completeReviewer, observeReviewerInvocation, observeReviewerStatus } from './review.mjs';
 import { activeTask, isSubagentEvent, mutateState, observeRuntime, readState } from './state.mjs';
-import { ownsPath, phpFeedbackInputs } from './tasks.mjs';
+import { phpFeedbackInputs, taskContainsCode } from './tasks.mjs';
 
 export async function handleEvent(event) {
     if (!relevantEvent(event)) return {};
@@ -93,7 +92,7 @@ export async function dispatchEvent(root, event, client) {
         if (subagent && event.hook_event_name === 'Stop') return {};
 
         if (task) {
-            task.containsCode = inputs.files.some(([path]) => ownsPath(task, path) && isCodePath(path));
+            task.containsCode = taskContainsCode(root, task, inputs);
         }
 
         if (event.hook_event_name === 'SessionStart' || event.hook_event_name === 'UserPromptSubmit') {

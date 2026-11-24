@@ -227,6 +227,12 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "codePaths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/path"
+          }
+        },
         "implementationGuidance": {
           "type": "array",
           "items": {

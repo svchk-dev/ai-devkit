@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## v0.4.0 (2026-11-25)
+
+- Allow consumers to declare additional runtime verification paths in `.devkit`.
+
 ## v0.3.0 (2026-11-25)
 
 - Add a shared Codex plugin for opted-in, trusted projects. It loads the
