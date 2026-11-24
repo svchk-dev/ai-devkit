@@ -1,0 +1,12 @@
+/vendor/
+/node_modules/
+/tmp/
+/.env
+/.env.*
+!/.env.example
+/auth.json
+/.DS_Store
+*.log
+/.idea/
+/.vscode/
+.deptrac.cache

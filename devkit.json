@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "profiles": [
+    "laravel-package",
+    "openspec",
+    "codex"
+  ],
+  "namespace": "Svchk\\Devkit",
+  "sourceRoots": [
+    "src"
+  ],
+  "architecture": {
+    "mode": "custom",
+    "rules": "docs/development.md",
+    "command": [
+      "make",
+      "analyse"
+    ]
+  },
+  "stateDirectory": "tmp/agent-hooks",
+  "references": [
+    "AGENTS.md",
+    "docs/index.md",
+    "standards/index.md",
+    "standards/coding.md",
+    "docs/development.md",
+    "docs/provenance.md",
+    "standards/rule-ownership.md"
+  ],
+  "openspec": {
+    "archiveFirst": true
+  },
+  "inputSets": {
+    "implementationGuidance": [
+      "standards/coding.md",
+      "standards/architecture.md",
+      "standards/laravel.md",
+      "standards/testing.md",
+      "standards/workflow.md",
+      "docs/adapter.md",
+      "docs/development.md"
+    ]
+  },
+  "checks": {
+    "docs": [
+      "make",
+      "check-docs"
+    ],
+    "format": [
+      "make",
+      "format-check"
+    ],
+    "analyse": [
+      "make",
+      "analyse"
+    ],
+    "full": [
+      "make",
+      "check"
+    ],
+    "conventions": [
+      "make",
+      "agent-conventions"
+    ],
+    "tooling": [
+      "make",
+      "agent-test"
+    ],
+    "php-rules": [
+      "make",
+      "test"
+    ],
+    "compatibility": [
+      "make",
+      "agent-rehearsal"
+    ],
+    "consumers": [
+      "make",
+      "test-consumer"
+    ]
+  },
+  "verificationProfiles": {
+    "docs": [
+      "docs"
+    ],
+    "php": [
+      "full",
+      "docs",
+      "conventions",
+      "format"
+    ],
+    "runtime": [
+      "full",
+      "docs",
+      "conventions",
+      "format"
+    ],
+    "tooling": [
+      "full",
+      "consumers",
+      "conventions",
+      "docs",
+      "compatibility"
+    ]
+  },
+  "environment": {
+    "identityCommand": [
+      "make",
+      "--silent",
+      "--no-print-directory",
+      "agent-identity"
+    ],
+    "inputs": [
+      ".env"
+    ],
+    "checks": [
+      "format",
+      "conventions",
+      "analyse",
+      "full",
+      "php-rules",
+      "consumers"
+    ]
+  },
+  "$schema": "config/adapter.schema.json"
+}

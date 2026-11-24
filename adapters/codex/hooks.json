@@ -1,0 +1,91 @@
+{
+  "description": "AI Devkit context, current checks and independent review. Activation and trust are explicit.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/vendor/svchk-dev/ai-devkit/agent-runtime/dispatcher.mjs\"",
+            "timeout": 30,
+            "statusMessage": "Checking AI Devkit project workflow"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/vendor/svchk-dev/ai-devkit/agent-runtime/dispatcher.mjs\"",
+            "timeout": 30,
+            "statusMessage": "Checking AI Devkit project workflow"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/vendor/svchk-dev/ai-devkit/agent-runtime/dispatcher.mjs\"",
+            "timeout": 30,
+            "statusMessage": "Checking AI Devkit project workflow"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/vendor/svchk-dev/ai-devkit/agent-runtime/dispatcher.mjs\"",
+            "timeout": 30,
+            "statusMessage": "Checking AI Devkit project workflow"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/vendor/svchk-dev/ai-devkit/agent-runtime/dispatcher.mjs\"",
+            "timeout": 30,
+            "statusMessage": "Checking AI Devkit project workflow"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/vendor/svchk-dev/ai-devkit/agent-runtime/dispatcher.mjs\"",
+            "timeout": 30,
+            "statusMessage": "Checking AI Devkit project workflow"
+          }
+        ]
+      }
+    ],
+    "Interrupt": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/vendor/svchk-dev/ai-devkit/agent-runtime/dispatcher.mjs\"",
+            "timeout": 3,
+            "statusMessage": "Checking AI Devkit project workflow"
+          }
+        ]
+      }
+    ]
+  }
+}

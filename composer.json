@@ -1,0 +1,58 @@
+{
+    "name": "svchk-dev/ai-devkit",
+    "description": "Shared engineering standards, skills and verification tools for AI-assisted Laravel development",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.5",
+        "phpstan/phpstan": "^2.3.2",
+        "symfony/process": "^8.1.10"
+    },
+    "require-dev": {
+        "deptrac/deptrac": "4.7.2",
+        "larastan/larastan": "3.13.2",
+        "laravel/boost": "2.10.3",
+        "laravel/framework": "13.44.1",
+        "laravel/pint": "1.32.1",
+        "orchestra/testbench": "11.3.0",
+        "phpunit/phpunit": "13.4.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Svchk\\Devkit\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Svchk\\Devkit\\Tests\\": "tests/"
+        }
+    },
+    "bin": [
+        "bin/devkit.mjs"
+    ],
+    "config": {
+        "sort-packages": true
+    },
+    "archive": {
+        "exclude": [
+            "/tests",
+            "/tmp",
+            "/.agents",
+            "/.github",
+            "/node_modules",
+            "/vendor",
+            "/.idea",
+            "/.vscode",
+            "/auth.json",
+            "/.env*",
+            "/*.log",
+            "/.deptrac.cache"
+        ]
+    },
+    "scripts": {
+        "test": "phpunit",
+        "format": "pint",
+        "format:check": "pint --test",
+        "analyse": "phpstan analyse --no-progress"
+    }
+}

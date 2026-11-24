@@ -1,0 +1,28 @@
+parameters:
+    devkitNamespace: App
+    devkitAreaLayout: true
+
+parametersSchema:
+    devkitNamespace: string()
+    devkitAreaLayout: bool()
+
+services:
+    -
+        class: Svchk\Devkit\PHPStan\DependencyNameRule
+        arguments:
+            projectNamespace: %devkitNamespace%
+        tags: [phpstan.rules.rule]
+    -
+        class: Svchk\Devkit\PHPStan\EventJobNameRule
+        arguments:
+            projectNamespace: %devkitNamespace%
+        tags: [phpstan.rules.rule]
+    -
+        class: Svchk\Devkit\PHPStan\EnumCaseRule
+        tags: [phpstan.rules.rule]
+    -
+        class: Svchk\Devkit\PHPStan\ComponentServiceRule
+        arguments:
+            projectNamespace: %devkitNamespace%
+            useAreaLayout: %devkitAreaLayout%
+        tags: [phpstan.rules.rule]

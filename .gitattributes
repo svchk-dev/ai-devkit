@@ -1,0 +1,11 @@
+/.agents export-ignore
+/.github export-ignore
+/tests export-ignore
+/tmp export-ignore
+/node_modules export-ignore
+/vendor export-ignore
+/.idea export-ignore
+/.vscode export-ignore
+/auth.json export-ignore
+/.env* export-ignore
+.deptrac.cache export-ignore

@@ -1,0 +1,265 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AI Devkit consumer adapter",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "profiles": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "laravel-application",
+          "laravel-package",
+          "filament",
+          "openspec",
+          "codex"
+        ]
+      }
+    },
+    "namespace": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*(?:\\\\[A-Za-z_][A-Za-z0-9_]*)*$"
+    },
+    "sourceRoots": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/path"
+      },
+      "minItems": 1
+    },
+    "architecture": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "enum": [
+            "areas",
+            "custom"
+          ]
+        },
+        "rules": {
+          "$ref": "#/$defs/path"
+        },
+        "command": {
+          "$ref": "#/$defs/argv"
+        },
+        "additionalAreas": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9]*$",
+            "not": {
+              "enum": [
+                "Main",
+                "Admin",
+                "Web",
+                "Console",
+                "Api"
+              ]
+            }
+          }
+        },
+        "compositionRoots": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "mode"
+      ]
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pint": {
+          "type": "object"
+        },
+        "phpstan": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "level": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "bootstrapFiles": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/path"
+              }
+            },
+            "excludePaths": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/path"
+              }
+            }
+          }
+        }
+      }
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/argv"
+      }
+    },
+    "verificationProfiles": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/path"
+      }
+    },
+    "specializedReferences": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "$ref": "#/$defs/path"
+          },
+          "references": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/path"
+            }
+          }
+        },
+        "required": [
+          "path",
+          "references"
+        ]
+      }
+    },
+    "inputSets": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "implementationGuidance": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/path"
+          }
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "identityCommand": {
+          "$ref": "#/$defs/argv"
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/path"
+          }
+        },
+        "scopeVariable": {
+          "type": "string",
+          "pattern": "^[A-Z_][A-Z0-9_]*$"
+        },
+        "baselineVariable": {
+          "type": "string",
+          "pattern": "^[A-Z_][A-Z0-9_]*$"
+        },
+        "candidateVariable": {
+          "type": "string",
+          "pattern": "^[A-Z_][A-Z0-9_]*$"
+        },
+        "sessionVariable": {
+          "type": "string",
+          "pattern": "^[A-Z_][A-Z0-9_]*$"
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "references": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/path"
+          }
+        }
+      }
+    },
+    "stateDirectory": {
+      "$ref": "#/$defs/path"
+    },
+    "resourceDirectory": {
+      "$ref": "#/$defs/path"
+    },
+    "objectiveRuleIdentifiers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "openspec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "archiveFirst": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "archiveFirst"
+      ]
+    }
+  },
+  "required": [
+    "schemaVersion"
+  ],
+  "$defs": {
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Repository-relative contained path; runtime validation also resolves symlink boundaries."
+    },
+    "argv": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

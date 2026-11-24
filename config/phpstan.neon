@@ -1,0 +1,4 @@
+parameters:
+    level: 8
+    treatPhpDocTypesAsCertain: false
+    reportIgnoresWithoutComments: true

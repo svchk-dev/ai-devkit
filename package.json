@@ -1,0 +1,18 @@
+{
+  "name": "ai-devkit-tools",
+  "private": true,
+  "type": "module",
+  "packageManager": "npm@12.2.0",
+  "engines": {
+    "node": ">=26.11.1 <27",
+    "npm": ">=12.2.0 <13"
+  },
+  "scripts": {
+    "test": "node --test tests/Node/*.test.mjs",
+    "check:docs": "node tooling/check-docs.mjs",
+    "spec:validate": "openspec validate --all --strict --no-interactive"
+  },
+  "devDependencies": {
+    "@fission-ai/openspec": "1.14.3"
+  }
+}
