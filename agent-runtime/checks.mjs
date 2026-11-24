@@ -48,9 +48,11 @@ export function selectsInput(checkId, path, root) {
     const selected = root ? configuredCommands(root) : checkCommands;
 
     if (!selected[checkId]) throw new Error('Unknown check id.');
-    if (/^(?:\.git|\.idea|\.vscode|tmp|vendor|node_modules|storage)(?:\/|$)/u.test(path)) return false;
+    if (path === '.git' || path.startsWith('.git/')) return false;
     if (adapter.stateDirectory && (path === adapter.stateDirectory || path.startsWith(adapter.stateDirectory + '/'))) return false;
     if (/(?:^|\/)(?:auth\.json|\.env(?:\..*)?)$/u.test(path) && !path.endsWith('.env.example')) return false;
+    if (checkId !== 'docs' && matchesCodePath(path, adapter.inputSets?.codePaths ?? [])) return true;
+    if (/^(?:\.idea|\.vscode|tmp|vendor|node_modules|storage)(?:\/|$)/u.test(path)) return false;
     if (isMakeDefinition(path) || path === '.devkit' || path === 'devkit.json' || path.startsWith('.ai/') || path.startsWith('.codex/') || path.startsWith('.agents/') || path.startsWith('agent-runtime/')) return true;
     if (path.startsWith((adapter.resourceDirectory ?? '.devkit') + '/') || ['AGENTS.md', '.gitignore', '.nvmrc'].includes(path)) return true;
     if (checkId === 'docs') {
@@ -58,7 +60,6 @@ export function selectsInput(checkId, path, root) {
             || ['package.json', 'package-lock.json', 'scripts/check-docs.mjs', 'tooling/check-docs.mjs'].includes(path);
     }
     if ((adapter.inputSets?.implementationGuidance ?? ['standards/coding.md', 'standards/architecture.md', 'standards/laravel.md', 'standards/testing.md', 'standards/workflow.md']).includes(path)) return true;
-    if (matchesCodePath(path, adapter.inputSets?.codePaths ?? [])) return true;
     if (path.endsWith('.md')) {
         const roots = [...(adapter.sourceRoots ?? ['src', 'app']), 'tests', 'config', 'database', 'resources', 'scripts', 'tooling'];
 

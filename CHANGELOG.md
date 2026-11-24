@@ -5,6 +5,7 @@
 ## v0.4.0 (2026-11-25)
 
 - Allow consumers to declare additional runtime verification paths in `.devkit`.
+- Validate project settings with the selected package when dispatching client hooks.
 
 ## v0.3.0 (2026-11-25)
 

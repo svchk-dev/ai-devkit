@@ -66,7 +66,8 @@ The `codex` profile opts into the [shared client plugin](usage.md#enable-codex-h
 Once installed, it uses Codex's project trust and verifies the installed package
 against the Composer lock and `.devkit` metadata before running it. The hook adds
 the project's installed standards, applicable skills and configured local
-references to the agent's context. Legacy snapshots still provide the
+references to the agent's context. The selected package validates the project
+settings. Legacy snapshots still provide the
 project-local hook and reviewer templates.
 
 Run the installed `agent-runtime/cli.mjs` directly for task registration, scope
@@ -75,7 +76,8 @@ changes, declared checks, review preparation and checkpoints. Set `checks` and
 and required checks. These can invoke installed tools directly.
 List additional runtime paths in `inputSets.codePaths` when a project keeps
 code or interface assets outside the default source layout. A documentation
-task cannot cover those paths. Runtime receipts include their contents.
+task cannot cover those paths. Runtime receipts include maintained files there.
+Credentials, Git metadata and the toolkit's state directory remain excluded.
 Run agent-runtime/compatibility.mjs --inventory to inspect current client trust
 and observed coverage. Register the actual runtime session and do not manufacture
 lifecycle events. Unavailable hooks do not waive manual checks or review.

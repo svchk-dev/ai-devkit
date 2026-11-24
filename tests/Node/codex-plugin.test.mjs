@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { chmodSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
@@ -94,6 +94,17 @@ test('one shared client hook dispatches to the exact installed version of each o
         assert.deepEqual(JSON.parse(result.stdout), { systemMessage: version });
         assert.equal(existsSync(join(root, '.codex')), false);
     }
+});
+
+test('the selected package owns validation of its adapter settings', async (context) => {
+    const { root } = await project(context, '0.4.1');
+    const adapter = JSON.parse(readFileSync(join(root, '.devkit'), 'utf8'));
+    write(root, '.devkit', { ...adapter, futureSetting: true });
+
+    const result = await invoke(root);
+
+    assert.equal(result.code, 0, result.stderr);
+    assert.deepEqual(JSON.parse(result.stdout), { systemMessage: '0.4.1' });
 });
 
 test('a project-layer trust claim and modified toolkit code cannot dispatch', async (context) => {

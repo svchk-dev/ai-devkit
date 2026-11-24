@@ -17,7 +17,8 @@ test('declared runtime asset paths are outside a documentation-only task', () =>
     try {
         writeFileSync(join(root, '.devkit'), JSON.stringify({
             schemaVersion: 1,
-            inputSets: { codePaths: ['presentation/assets/'] },
+            stateDirectory: './tmp/devkit/',
+            inputSets: { codePaths: ['presentation/assets/', 'storage/interface', 'tmp'] },
             checks: { docs: ['true'], full: ['true'] },
             verificationProfiles: { docs: ['docs'], runtime: ['full'] },
         }));
@@ -28,6 +29,9 @@ test('declared runtime asset paths are outside a documentation-only task', () =>
         assert.deepEqual(requiredChecks({ profile: 'runtime', paths: ['presentation/assets/icon.svg'] }, root), ['full']);
         assert.equal(selectsInput('full', 'presentation/assets/fixture.md', root), true);
         assert.equal(selectsInput('full', 'presentation/notes.md', root), false);
+        assert.equal(selectsInput('full', 'storage/interface/fixture.md', root), true);
+        assert.equal(selectsInput('full', 'storage/interface/.env.local', root), false);
+        assert.equal(selectsInput('full', 'tmp/devkit/state.json', root), false);
     } finally {
         rmSync(root, { recursive: true, force: true });
     }

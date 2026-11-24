@@ -1,7 +1,7 @@
 import { readFileSync, realpathSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { containedPath, readAdapter, selectsCodexPlugin } from '../../agent-runtime/adapter.mjs';
+import { containedPath, selectsCodexPlugin } from '../../agent-runtime/adapter.mjs';
 import { relevantEvent } from '../../agent-runtime/dispatcher.mjs';
 import { readEvent } from '../../agent-runtime/protocol.mjs';
 import { repositoryRoot } from '../../agent-runtime/repository.mjs';
@@ -11,9 +11,10 @@ import { projectIsTrusted } from './native-client.mjs';
 const packageName = 'svchk-dev/ai-devkit';
 const readJson = (path) => JSON.parse(readFileSync(path, 'utf8'));
 
-function selectedDispatcher(root, adapter) {
+function selectedDispatcher(root) {
     const manifest = readJson(containedPath(root, 'composer.json'));
     const lock = readJson(containedPath(root, 'composer.lock'));
+    const { toolkit } = readJson(containedPath(root, '.devkit'));
     const locked = lock['packages-dev']?.find((entry) => entry.name === packageName);
     const reference = packageReference(locked);
 
@@ -25,8 +26,8 @@ function selectedDispatcher(root, adapter) {
     const installed = toolkitSelection(root, directory);
 
     if (installed.reference !== reference || installed.version !== locked.version
-        || adapter.toolkit?.reference !== reference || adapter.toolkit?.version !== locked.version
-        || adapter.toolkit?.sourceIdentity !== toolkitIdentity(directory)) {
+        || toolkit?.reference !== reference || toolkit?.version !== locked.version
+        || toolkit?.sourceIdentity !== toolkitIdentity(directory)) {
         throw new Error('AI Devkit selection changed. Install the locked dependencies and run vendor/bin/devkit.mjs sync.');
     }
 
@@ -51,8 +52,7 @@ export async function dispatchPluginEvent(event) {
         throw new Error('AI Devkit requires the current project to be explicitly trusted in Codex.');
     }
 
-    const adapter = readAdapter(root);
-    const { handleEvent } = await import(selectedDispatcher(root, adapter));
+    const { handleEvent } = await import(selectedDispatcher(root));
 
     return handleEvent(event);
 }

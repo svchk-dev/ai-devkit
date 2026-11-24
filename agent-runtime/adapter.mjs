@@ -121,8 +121,9 @@ export function readAdapter(root) {
         throw new Error('The .devkit adapter reads shared resources from the installed package.');
     }
 
-    adapter.stateDirectory ??= 'tmp/devkit';
-    containedPath(root, adapter.stateDirectory);
+    const base = realpathSync(root);
+    const statePath = containedPath(base, adapter.stateDirectory ?? 'tmp/devkit');
+    adapter.stateDirectory = relative(base, statePath).split(sep).join('/');
     adapter.architecture ??= { mode: 'areas' };
 
     if (!['areas', 'custom'].includes(adapter.architecture.mode)) throw new Error('Unknown architecture mode.');
@@ -192,9 +193,9 @@ export function readAdapter(root) {
 
         if (paths === undefined) continue;
         if (!Array.isArray(paths)) throw new Error(`${key} must be a path array.`);
-        const resolved = paths.map((path) => containedPath(root, path));
+        const resolved = paths.map((path) => containedPath(base, path));
 
-        if (key === 'codePaths') adapter.inputSets.codePaths = resolved.map((path) => relative(root, path).split(sep).join('/'));
+        if (key === 'codePaths') adapter.inputSets.codePaths = resolved.map((path) => relative(base, path).split(sep).join('/'));
     }
 
     object(adapter.checks ?? {}, 'checks');
