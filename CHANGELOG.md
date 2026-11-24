@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.2.0 (2026-11-24)
+
 - Add the single-file `.devkit` Composer setup. Explicit sync creates or
   refreshes package metadata without overwriting local settings.
 - Read shared resources from the installed package in single-file mode.

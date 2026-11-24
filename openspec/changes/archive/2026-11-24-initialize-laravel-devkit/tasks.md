@@ -51,8 +51,8 @@
 
 ## 7. Support a single-file setup
 
-- [ ] 7.1 Generate and refresh one `.devkit` file, preserving local settings while referencing installed resources. Verify a clean install, an update, an unchanged repeat and legacy adapter compatibility.
-- [ ] 7.2 Document single-file setup, optional profile activation and the migration from legacy snapshots. Verify the independent consumer and obtain independent review.
+- [x] 7.1 Generate and refresh one `.devkit` file, preserving local settings while referencing installed resources. Verify a clean install, an update, an unchanged repeat and legacy adapter compatibility.
+- [x] 7.2 Document single-file setup, optional profile activation and the migration from legacy snapshots. Verify the independent consumer and obtain independent review.
 
 ## Workflow follow-up
 

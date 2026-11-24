@@ -8,8 +8,8 @@ the same engineering practices across projects while keeping each project's
 business rules and explicit exceptions local.
 
 The Composer package is **svchk-dev/ai-devkit**, installed directly as a
-development dependency. Initial acceptance is tracked in the
-[implementation change](openspec/changes/initialize-laravel-devkit/proposal.md).
+development dependency. See the [toolkit specification](openspec/specs/development-toolkit/spec.md)
+for the supported contract.
 
 ## Why it exists
 
@@ -162,7 +162,7 @@ HTTP probe after runtime-only installation.
 The trusted Codex integration was exercised with actual lifecycle events,
 including scope recovery, native and shell edits, delayed check completion,
 separate review, Stop feedback and interruption. See the
-[acceptance evidence](openspec/changes/initialize-laravel-devkit/evidence.md)
+[acceptance evidence](openspec/changes/archive/2026-11-24-initialize-laravel-devkit/evidence.md)
 for the tested client identity and scope.
 
 The development baseline is PHP 8.5, Laravel 13 and Node 26. See

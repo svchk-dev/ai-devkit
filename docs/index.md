@@ -10,7 +10,7 @@
 | Adapter and resource lifecycle | [Adapter](adapter.md) |
 | Standalone tools and internal layout | [Development](development.md) |
 | Licensing and publication readiness | [Provenance](provenance.md) |
-| Initial implementation contract | [Change](../openspec/changes/initialize-laravel-devkit/proposal.md) |
+| Toolkit and agent workflow contracts | [OpenSpec specifications](../openspec/specs) |
 
 Consumer site architecture defaults do not prescribe this repository's internal
 layout. Read all applicable source standards before changing code. Report actual

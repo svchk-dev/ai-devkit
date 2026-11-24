@@ -56,6 +56,10 @@ entry points that referenced snapshots to use installed resources or
 consumer-owned configurations.
 Preserve local exceptions, trusted-client settings and application data.
 
+To return to a version that predates single-file support, restore its saved
+Composer lock and manifest together with the legacy devkit.json and matching
+managed directory and ownership manifest.
+
 Legacy projects can continue to sync their existing layout with the new toolkit.
 The legacy command reports conflicting ownership or edited files before
 replacement and retains previous resources on a failed staged update.

@@ -135,3 +135,21 @@ OpenSpec validation and the release skill validator passed. An independent
 review walked through patch, minor, breaking and maintenance decisions and
 passed the corrected policy and publication records. This maintenance change
 does not warrant advancing the package version.
+
+## Single-file setup
+
+The local release rehearsal passed 12 PHP tests with 33 assertions, 103 Node
+tests, strict Composer validation, and independent Laravel application and
+package-host checks. Synthetic Composer distributions verified single-file
+creation, update, repeat sync, unchanged project settings, continued legacy
+snapshot support, and runtime-only installation. The suite also exercised the
+installed architecture and PHP convention commands with the single-file adapter.
+
+The actual trusted Codex CLI 0.166.0-alpha.6 ran the executable package code
+from `152bc1fded3bb2631b35ce1d47a50094fc128a68`. The migration retained old
+snapshot paths in the Git index while preparing the new adapter. The client
+observed native and shell edits, a delayed successful check, independent
+review, completion, resume, compaction and interruption. The compatibility
+command passed for the recorded session with all required events. The
+existing trusted hook definitions were preserved. Independent source review
+accepted the single-file implementation and watcher correction.
