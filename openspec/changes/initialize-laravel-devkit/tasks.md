@@ -31,7 +31,7 @@
 - [x] 4.3 Implement relevant-input identity/observation for consumer inputs and actual installed or development-linked toolkit resources; verify changed/restored inputs, concurrent edits, version changes and reporting-only reuse.
 - [x] 4.4 Implement independent reviewer request/provenance and freshness with local reviewer extensions; verify unobserved/self-authored/running reviewers cannot pass and final substantive edits require follow-up review.
 - [x] 4.5 Implement bounded completion and isolated recoverable local state; document recovery and verify task/worktree isolation, consumed checkpoints, interruption, malformed state and secret/transcript exclusion.
-- [ ] 4.6 Provide the Codex adapter and explicit activation guidance without automatic trust changes; verify synthetic lifecycle scenarios and perform a real trusted-client rehearsal with current client and implementation identities.
+- [x] 4.6 Provide the Codex adapter and explicit activation guidance without automatic trust changes; verify synthetic lifecycle scenarios and perform a real trusted-client rehearsal with current client and implementation identities.
 
 ## 5. Verify independent adoption and compatibility
 

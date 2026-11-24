@@ -2,10 +2,10 @@
 
 ## Select a source
 
-AI Devkit has no published release yet. The package identity is svchk-dev/ai-devkit.
-Local evaluation may use a Composer path repository or isolated versioned
-artifacts. Such a source is a development rehearsal; a shared consumer needs a
-portable immutable release before committing final integration.
+The package identity is svchk-dev/ai-devkit. Select an immutable release for
+tracked integrations so any checkout can install the same version. For local
+evaluation, a Composer path repository or isolated versioned artifact can
+exercise the integration before selecting a release.
 
 Install the selected toolkit directly in the consumer's root require-dev.
 Select compatible ecosystem tools explicitly: PHPStan is an execution dependency

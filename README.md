@@ -7,9 +7,8 @@ standards, architecture conventions, agent skills and verification tools. Adopt
 the same engineering practices across projects while keeping each project's
 business rules and explicit exceptions local.
 
-The intended Composer package is **svchk-dev/ai-devkit**, installed directly as
-a development dependency. The toolkit is under active development: no public
-package or release is available yet. Initial acceptance is tracked in the
+The Composer package is **svchk-dev/ai-devkit**, installed directly as a
+development dependency. Initial acceptance is tracked in the
 [implementation change](openspec/changes/initialize-laravel-devkit/proposal.md).
 
 ## Why it exists
@@ -121,10 +120,15 @@ separate adapters; support for them is not currently claimed.
 
 ## How adoption works
 
-After a compatible release is available, add the selected version directly to the
-root Composer development dependencies and commit the resolved lockfile. Selected
-ecosystem tools remain explicit project dependencies. There is no Composer plugin
-and no automatic installation-time rewrite of project instructions.
+Install a compatible published version as a root Composer development dependency
+and commit the resolved lockfile. For the 0.1 series, use:
+
+```sh
+composer require --dev svchk-dev/ai-devkit:^0.1
+```
+
+Selected ecosystem tools remain explicit project dependencies. Resource
+preparation runs through the separate commands below.
 
 With development dependencies installed, create a project-owned devkit.json:
 
@@ -174,10 +178,11 @@ layout override, and a package booted through Testbench. Synthetic immutable
 Composer artifacts cover updates, saved-lock restoration, managed removal and an
 HTTP probe after runtime-only installation.
 
-Acceptance remains in progress. The final public-file/provenance review and the
-real trusted-client rehearsal are not yet complete. Synthetic lifecycle tests do
-not establish that a client has trusted or executed the hooks. No hosted CI
-result or public-distribution readiness is claimed.
+The trusted Codex integration was exercised with actual lifecycle events,
+including scope recovery, native and shell edits, delayed check completion,
+separate review, Stop feedback and interruption. See the
+[acceptance evidence](openspec/changes/initialize-laravel-devkit/evidence.md)
+for the tested client identity and scope.
 
 The development baseline is PHP 8.5, Laravel 13 and Node 26. See
 [development](docs/development.md) for exact pins and commands. Wider platform
@@ -204,7 +209,6 @@ repository's own OpenSpec workflow and receive separate independent review.
 
 ## License and publication
 
-The local implementation uses the [MIT license](LICENSE). Review
-[source provenance](docs/provenance.md) before preparing a distribution candidate.
-Package identity and licensing metadata are local preparation; no repository
-remote, tag or package registration has been published.
+AI Devkit uses the [MIT license](LICENSE). See
+[source provenance](docs/provenance.md) and
+[third-party notices](THIRD_PARTY_NOTICES).

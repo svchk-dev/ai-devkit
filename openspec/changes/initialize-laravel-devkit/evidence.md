@@ -75,3 +75,30 @@ The whole change received incomplete because actual trusted-client acceptance
 and final public-candidate review remain open. Runtime and consumer results were
 executed by the coordinator and independently checked against their logs; the
 reviewer did not mutate files or manufacture hook receipts.
+
+## Trusted Codex client acceptance
+
+The installed Codex CLI 0.166.0-alpha.6 reported all seven selected hook
+definitions active and trusted after the owner accepted them in Codex.
+The test ran in an independent disposable Laravel application with the
+installed fixture package. Its selected package identity was
+`bf361ea44e8bf8290de17f1a013c4208fe0d33f5ba445873a2212591d9632194`.
+The package's executable sources, standards, configuration, adapters and
+managed-resource inputs were compared byte for byte with the publication
+checkout. Synthetic version metadata and subsequent release prose differ.
+
+The actual app-server session registered a scoped Markdown change, used
+native apply_patch and a separate shell write, and ran its declared check.
+Codex reported the process in progress and later received exit 0 after
+roughly four seconds. The resulting receipt passed with complete observation
+and no concurrent input changes. Stop blocked the first completion attempt
+pending review and accepted a scoped progress checkpoint. The resumed session
+launched a separate project reviewer. The runtime accepted its matching
+completed result through collaboration status, with no findings or limitations.
+The final Stop consumed the complete checkpoint and closed the task.
+
+An independent test session observed an actual interrupt. A supported context
+compaction followed by a normal turn restored project context. The installed
+compatibility command exited 0 with no missing definition or unobserved
+required event. Operational state, raw tool output and transcripts are kept
+out of the distribution.

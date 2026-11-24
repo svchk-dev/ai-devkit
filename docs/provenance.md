@@ -1,9 +1,8 @@
 # Source provenance
 
-Original toolkit code, documentation and resource templates are maintained under
-the repository MIT license. The name is AI Devkit. The MIT license is a local
-implementation default; public publication still requires an explicit
-owner instruction and a final distribution review.
+Original toolkit code, documentation and resource templates use the repository's
+MIT license. Public releases require explicit owner authorization and review of
+the exact files selected for distribution.
 
 | Resource | Source and ownership | Distribution treatment |
 | --- | --- | --- |
