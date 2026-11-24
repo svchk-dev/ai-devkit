@@ -3,7 +3,7 @@ import { assessCompletion } from './completion.mjs';
 import { isCodePath } from './checks.mjs';
 import { installedClientIdentity } from './compatibility.mjs';
 import { projectContext } from './context.mjs';
-import { contextOutput, failureOutput, readEvent } from './protocol.mjs';
+import { agentCommand, contextOutput, failureOutput, readEvent } from './protocol.mjs';
 import { observeProposalPermission, proposalCreationTargets, proposalToolBlock, shellCommands } from './proposals.mjs';
 import { coveragePolicyIdentity, repositoryRoot, snapshot } from './repository.mjs';
 import { completeReviewer, observeReviewerInvocation, observeReviewerStatus } from './review.mjs';
@@ -43,7 +43,7 @@ function supportedWrite(event) {
         || (words[0] === 'make' && words.includes('format')));
 }
 
-function relevantEvent(event) {
+export function relevantEvent(event) {
     if (!['PreToolUse', 'PostToolUse'].includes(event.hook_event_name)) return true;
     if (event.hook_event_name === 'PostToolUse' && reviewerTools.has(event.tool_name)) return true;
     if (supportedWrite(event)) return true;
@@ -139,7 +139,7 @@ export async function dispatchEvent(root, event, client) {
                 task.mode = 'change';
                 task.scopeMissing = true;
 
-                return contextOutput(event, 'Repository inputs changed during a read-only task. Establish the actual owned scope and verification profile with make agent-task scope; do not adopt another actor\'s edits automatically.');
+                return contextOutput(event, `Repository inputs changed during a read-only task. Establish the actual owned scope and verification profile with ${agentCommand} scope. Preserve other actors' edits.`);
             }
 
             if (task.mode === 'read-only' || task.mode === 'review') {
@@ -149,7 +149,7 @@ export async function dispatchEvent(root, event, client) {
             if (task.profile === 'docs' && task.containsCode) {
                 task.scopeMissing = true;
 
-                return contextOutput(event, 'The documentation profile no longer covers the owned code inputs. Establish the appropriate code verification profile with make agent-task scope.');
+                return contextOutput(event, `The documentation profile no longer covers the owned code inputs. Establish the appropriate code verification profile with ${agentCommand} scope.`);
             }
 
             if (changedPhp.length) {
@@ -173,7 +173,7 @@ export async function dispatchEvent(root, event, client) {
 
                 state.unregisteredStopRequested = true;
 
-                return { decision: 'block', reason: 'Register the authorized task scope with make agent-task, then provide a current completion or honest non-success checkpoint.' };
+                return { decision: 'block', reason: `Register the authorized task scope with ${agentCommand} start, then provide a current completion or honest non-success checkpoint.` };
             }
 
             return assessCompletion(root, state, task, event);

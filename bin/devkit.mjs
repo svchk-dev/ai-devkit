@@ -2,6 +2,7 @@
 import { checkArchitecture } from '../agent-runtime/architecture.mjs';
 import { synchronize } from '../agent-runtime/resources.mjs';
 import { readAdapter, assertPrerequisites } from '../agent-runtime/adapter.mjs';
+import { runQuality } from '../agent-runtime/quality.mjs';
 
 try {
     const [operation, ...options] = process.argv.slice(2);
@@ -27,11 +28,15 @@ try {
             result = { profiles: adapter.profiles, architecture: adapter.architecture.mode, sourceRoots: adapter.sourceRoots };
             break;
         }
+        case 'format':
+        case 'analyse':
+            process.exitCode = runQuality(root, operation, options[0] === '--' ? options.slice(1) : options);
+            break;
         default:
-            throw new Error('Use devkit sync [--check], remove, doctor or architecture.');
+            throw new Error('Use devkit sync [--check], remove, doctor, architecture, format or analyse.');
     }
 
-    process.stdout.write(JSON.stringify(result, null, 2) + '\n');
+    if (result !== undefined) process.stdout.write(JSON.stringify(result, null, 2) + '\n');
 } catch (error) {
     process.stderr.write('Devkit: ' + error.message + '\n');
     process.exitCode = 1;

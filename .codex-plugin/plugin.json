@@ -1,0 +1,5 @@
+{
+  "name": "ai-devkit",
+  "description": "Shared guidance and verification for AI Devkit projects",
+  "hooks": "./adapters/codex/plugin-hooks.json"
+}

@@ -28,6 +28,31 @@ the explicit sync command prepares its project settings. See the
 [Composer script lifecycle](https://getcomposer.org/doc/articles/scripts.md)
 and [adapter guide](adapter.md).
 
+## Enable Codex hooks
+
+Add the AI Devkit marketplace and plugin once per Codex installation. Select a
+published Git tag that contains the plugin and substitute it for `TAG` below.
+For local testing, pass the AI Devkit checkout path as the marketplace source.
+
+```sh
+codex plugin marketplace add svchk-dev/ai-devkit --ref TAG
+codex plugin add ai-devkit@svchk-dev
+```
+
+Review and trust the plugin hooks in Codex's `/hooks` interface. Trust each
+participating repository through Codex's project trust prompt. Add `codex` to
+the project's `.devkit` profiles, run `vendor/bin/devkit.mjs sync`, and start a
+new session to load the shared guidance. Keep `codex` and Node on the client
+PATH. A separate `project_reviewer` role can be installed once at user scope
+from the [reviewer template](../adapters/codex/project_reviewer.toml), or the
+project can supply its own role when its review contract requires one.
+
+Run `node vendor/svchk-dev/ai-devkit/agent-runtime/compatibility.mjs --inventory`
+in the project to inspect native activation. When migrating existing project
+hooks, disable their duplicate definitions after checking the shared plugin's
+trust and behavior. Repeat the actual lifecycle rehearsal when the executing
+toolkit or hook definitions change.
+
 ## Update or restore a selected version
 
 1. Review the target version's change and select it in require-dev.
@@ -50,10 +75,8 @@ any remaining local files out of the old `.devkit/` directory and remove the
 empty directory before creating the file at the same path.
 
 Rename `devkit.json` to `.devkit` and remove its `resourceDirectory` setting.
-Transfer any `quality` overrides to the project's Pint or PHPStan configuration
-and remove `quality` from the adapter before running sync. Update existing
-entry points that referenced snapshots to use installed resources or
-consumer-owned configurations.
+Keep `quality` overrides in `.devkit`. Update callers of snapshots to use the
+installed executable and resources or consumer-owned configurations.
 Preserve local exceptions, trusted-client settings and application data.
 
 To return to a version that predates single-file support, restore its saved
@@ -66,9 +89,10 @@ replacement and retains previous resources on a failed staged update.
 
 ## Remove the integration
 
-Disable any consumer-owned hooks and remove references to the toolkit from
-project commands. Review and remove the project-owned `.devkit` file, then
-remove the Composer development dependency. For a legacy snapshot, run the
+Remove the `codex` profile to opt the repository out of the shared hooks. Disable
+any remaining consumer-owned hooks and remove references to the toolkit from
+project commands. Review and remove `.devkit`, then remove the Composer
+development dependency. For a legacy snapshot, run the
 toolkit's `remove` command before removing the dependency. Preserve any local
 additions or task evidence still needed by the project.
 

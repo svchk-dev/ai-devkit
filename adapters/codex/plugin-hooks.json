@@ -1,0 +1,91 @@
+{
+  "description": "Shared AI Devkit hooks for trusted, opted-in workspaces.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/adapters/codex/plugin.mjs\"",
+            "timeout": 30,
+            "statusMessage": "Checking AI Devkit project workflow"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/adapters/codex/plugin.mjs\"",
+            "timeout": 30,
+            "statusMessage": "Checking AI Devkit project workflow"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/adapters/codex/plugin.mjs\"",
+            "timeout": 30,
+            "statusMessage": "Checking AI Devkit project workflow"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/adapters/codex/plugin.mjs\"",
+            "timeout": 30,
+            "statusMessage": "Checking AI Devkit project workflow"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/adapters/codex/plugin.mjs\"",
+            "timeout": 30,
+            "statusMessage": "Checking AI Devkit project workflow"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/adapters/codex/plugin.mjs\"",
+            "timeout": 30,
+            "statusMessage": "Checking AI Devkit project workflow"
+          }
+        ]
+      }
+    ],
+    "Interrupt": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/adapters/codex/plugin.mjs\"",
+            "timeout": 3,
+            "statusMessage": "Checking AI Devkit project workflow"
+          }
+        ]
+      }
+    ]
+  }
+}

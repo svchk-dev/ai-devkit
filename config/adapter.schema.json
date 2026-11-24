@@ -11,14 +11,36 @@
       "description": "Installed toolkit metadata maintained by sync.",
       "type": "object",
       "additionalProperties": false,
-      "required": ["version", "reference", "sourceIdentity", "standards", "skills"],
+      "required": [
+        "version",
+        "reference",
+        "sourceIdentity",
+        "standards",
+        "skills"
+      ],
       "properties": {
-        "version": { "type": "string" },
-        "reference": { "type": ["string", "null"] },
-        "sourceIdentity": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-        "standards": { "$ref": "#/$defs/path" },
-        "skills": { "$ref": "#/$defs/path" },
-        "hooks": { "$ref": "#/$defs/path" }
+        "version": {
+          "type": "string"
+        },
+        "reference": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sourceIdentity": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "standards": {
+          "$ref": "#/$defs/path"
+        },
+        "skills": {
+          "$ref": "#/$defs/path"
+        },
+        "hooks": {
+          "$ref": "#/$defs/path"
+        }
       }
     },
     "schemaVersion": {
@@ -120,8 +142,39 @@
               "items": {
                 "$ref": "#/$defs/path"
               }
+            },
+            "phpVersion": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "paths": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/path"
+              }
+            },
+            "includes": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/path"
+              }
+            },
+            "configDirectories": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/path"
+              }
+            },
+            "databaseMigrationsPath": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/path"
+              }
             }
           }
+        },
+        "php": {
+          "$ref": "#/$defs/argv"
         }
       }
     },

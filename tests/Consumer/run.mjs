@@ -251,7 +251,7 @@ function boostDiscovery(consumer) {
 }
 
 function singleFileTransition(consumer) {
-    const { directory } = consumer;
+    const { directory, sourceRoot } = consumer;
     const legacy = join(directory, 'devkit.json');
     const snapshot = join(directory, '.devkit');
     const policy = JSON.parse(readFileSync(legacy, 'utf8'));
@@ -264,7 +264,12 @@ function singleFileTransition(consumer) {
 
     assert.equal(created.toolkit.version, '0.1.0');
     assert.equal(existsSync(join(directory, 'devkit.resources.json')), false);
-    write(directory, '.devkit', { ...created, ...policy });
+    const quality = {
+        php: ['docker', ...dockerCommand(directory), 'php'],
+        pint: { 'cache-file': 'tmp/consumer-pint.cache' },
+        phpstan: { paths: [sourceRoot], phpVersion: 80511 },
+    };
+    write(directory, '.devkit', { ...created, ...policy, quality });
 
     const metadata = JSON.parse(readFileSync(join(directory, 'composer.json'), 'utf8'));
     metadata['require-dev']['svchk-dev/ai-devkit'] = '0.2.0';
@@ -275,16 +280,48 @@ function singleFileTransition(consumer) {
     cli(directory, 'doctor');
     cli(directory, 'architecture');
     php(directory, ['vendor/svchk-dev/ai-devkit/bin/conventions.php']);
+    const invalidPhp = '<?php function devkitQualityProbe( ): int { return "broken"."type"; }\n';
+    const outsidePath = 'other/OutsideProbe.php';
+    write(directory, outsidePath, invalidPhp);
+    cli(directory, 'format', '--test', '--format', 'json');
+    cli(directory, 'analyse', '--no-progress');
+
+    const badPath = sourceRoot + '/QualityProbe.php';
+    write(directory, badPath, invalidPhp);
+    const executable = join(directory, 'vendor/bin/devkit.mjs');
+    const styleFailure = execute(executable, ['format', '--test'], directory, 1);
+    const typeFailure = execute(executable, ['analyse', '--no-progress', badPath], directory, 1);
+    assert.match(styleFailure, /QualityProbe\.php/u);
+    assert.doesNotMatch(styleFailure, /OutsideProbe\.php/u);
+    assert.match(execute(executable, ['format', '--test', outsidePath], directory, 1), /OutsideProbe\.php/u);
+    assert.match(execute(executable, ['format', '--test', '--no-config'], directory, 1), /quality configuration in \.devkit/u);
+    assert.match(typeFailure, /should return int but returns string/u);
+
+    const current = JSON.parse(readFileSync(snapshot, 'utf8'));
+    const rootPint = { ...quality.pint, in: ['.'], exclude: ['vendor', 'other', 'storage', 'tmp'] };
+    const rootOnlyPath = 'additional/RootProbe.php';
+    write(directory, rootOnlyPath, invalidPhp);
+    write(directory, '.devkit', { ...current, quality: { ...quality, pint: rootPint } });
+    const rootFailure = execute(executable, ['format', '--test'], directory, 1);
+    assert.match(rootFailure, /QualityProbe\.php/u);
+    assert.match(rootFailure, /RootProbe\.php/u);
+    assert.doesNotMatch(rootFailure, /OutsideProbe\.php/u);
+    write(directory, '.devkit', current);
+    rmSync(join(directory, badPath));
+    rmSync(join(directory, outsidePath));
+    rmSync(join(directory, rootOnlyPath));
+
     applicationRuntime(consumer);
 
     const refreshed = JSON.parse(readFileSync(snapshot, 'utf8'));
     assert.equal(refreshed.toolkit.version, '0.2.0');
     assert.notEqual(refreshed.toolkit.sourceIdentity, created.toolkit.sourceIdentity);
     assert.deepEqual(refreshed.architecture, policy.architecture);
+    assert.deepEqual(refreshed.quality, quality);
     assert.equal(readFileSync(join(directory, 'AGENTS.md'), 'utf8'), 'Local project rules remain local.\n');
     assert.match(readFileSync(join(directory, refreshed.toolkit.standards), 'utf8'), /engineering standards/u);
     assert.match(readFileSync(join(directory, 'vendor/svchk-dev/ai-devkit/standards/coding.md'), 'utf8'), /Synthetic update fixture/u);
-    results.push({ singleFileAdapter: true, versions: ['0.1.0', '0.2.0'], localPolicyPreserved: true });
+    results.push({ singleFileAdapter: true, versions: ['0.1.0', '0.2.0'], localPolicyPreserved: true, qualityCommands: true });
 }
 
 function transition(consumer) {

@@ -1,6 +1,7 @@
 import { readAdapter } from './adapter.mjs';
 import { existsSync, readdirSync } from 'node:fs';
-import { join, relative, resolve } from 'node:path';
+import { join } from 'node:path';
+import { nativeEditPaths } from './protocol.mjs';
 
 const changeName = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/u;
 
@@ -168,15 +169,8 @@ export function proposalToolBlock(root, state, event) {
         for (const name of proposalCreationTargets(command)) targets.set(name, false);
     }
 
-    const paths = [input?.file_path, input?.path];
-
-    if (typeof command === 'string' && /(?:apply_patch|Edit|Write)$/u.test(event.tool_name ?? '')) {
-        for (const match of command.matchAll(/^\*\*\* (?:Add File|Update File|Move to): (.+)$/gmu)) paths.push(match[1]);
-    }
-
-    for (const path of paths.filter((value) => typeof value === 'string')) {
-        const local = relative(root, resolve(event.cwd, path)).replaceAll('\\', '/');
-        const match = /^openspec\/changes\/([^/]+)\//u.exec(local);
+    for (const path of nativeEditPaths(root, event, { deletions: false })) {
+        const match = /^openspec\/changes\/([^/]+)\//u.exec(path);
 
         if (match && match[1] !== 'archive' && changeName.test(match[1])) targets.set(match[1], true);
     }

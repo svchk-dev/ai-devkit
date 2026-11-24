@@ -31,6 +31,7 @@ test('sync refreshes one adapter file while keeping project settings', () => {
         const policy = JSON.parse(readFileSync(path, 'utf8'));
 
         assert.equal(policy.toolkit.version, '0.2.0');
+        assert.equal(policy.stateDirectory, 'vendor/.ai-devkit');
         policy.namespace = 'Example\\Application';
         policy.profiles = ['codex'];
         policy.sourceRoots = ['lib'];
@@ -42,7 +43,7 @@ test('sync refreshes one adapter file while keeping project settings', () => {
         const refreshed = JSON.parse(readFileSync(path, 'utf8'));
 
         assert.equal(refreshed.toolkit.version, '0.2.1');
-        assert.match(refreshed.toolkit.hooks, /adapters\/codex\/hooks\.json$/u);
+        assert.match(refreshed.toolkit.hooks, /adapters\/codex\/plugin-hooks\.json$/u);
         assert.equal(refreshed.namespace, 'Example\\Application');
         assert.deepEqual(readAdapter(root).sourceRoots, ['lib']);
         assert.equal(synchronize(root).changed, false);
@@ -51,7 +52,8 @@ test('sync refreshes one adapter file while keeping project settings', () => {
         assert.throws(() => synchronize(root, { remove: true }), /project-owned/u);
 
         writeFileSync(path, JSON.stringify({ ...refreshed, quality: { phpstan: { level: 9 } } }));
-        assert.throws(() => synchronize(root), /Move quality settings/u);
+        assert.equal(synchronize(root).changed, false);
+        assert.equal(readAdapter(root).quality.phpstan.level, 9);
         writeFileSync(path, JSON.stringify(refreshed));
         writeFileSync(join(root, 'devkit.json'), '{"schemaVersion":1}');
         assert.throws(() => synchronize(root), /Both/u);

@@ -25,13 +25,17 @@ export function distributionFiles(directory = toolkitRoot) {
     return files.sort();
 }
 
-export function toolkitIdentity() {
-    const inputs = distributionFiles().filter((path) => !/^openspec\/changes\/.+\/(?:tasks|evidence)\.md$/u.test(relative(toolkitRoot, path).replaceAll('\\\\', '/')));
+export function toolkitIdentity(directory = toolkitRoot) {
+    const inputs = distributionFiles(directory).filter((path) => !/^openspec\/changes\/.+\/(?:tasks|evidence)\.md$/u.test(relative(directory, path).replaceAll('\\\\', '/')));
 
-    return hash(JSON.stringify(inputs.map((path) => [relative(toolkitRoot, path), hash(readFileSync(path))])));
+    return hash(JSON.stringify(inputs.map((path) => [relative(directory, path), hash(readFileSync(path))])));
 }
 
-function toolkitSelection(root) {
+export function packageReference(selection) {
+    return selection?.source?.reference || selection?.dist?.reference || selection?.dist?.shasum || null;
+}
+
+export function toolkitSelection(root, directory = toolkitRoot) {
     const installedPath = containedPath(root, 'vendor/composer/installed.json');
 
     if (existsSync(installedPath)) {
@@ -40,12 +44,19 @@ function toolkitSelection(root) {
         const selected = packages?.find((item) => item.name === 'svchk-dev/ai-devkit');
 
         if (selected && selected['install-path']
-            && realpathSync(resolve(dirname(installedPath), selected['install-path'])) === realpathSync(toolkitRoot)) {
-            return { version: selected.version, reference: selected.source?.reference ?? selected.dist?.reference ?? null };
+            && realpathSync(resolve(dirname(installedPath), selected['install-path'])) === realpathSync(directory)) {
+            return { version: selected.version, reference: packageReference(selected) };
         }
     }
 
     return { version: 'development', reference: null };
+}
+
+export function pintSettings(adapter) {
+    const shared = JSON.parse(readFileSync(join(toolkitRoot, 'config/pint.json'), 'utf8'));
+    const local = adapter.quality?.pint ?? {};
+
+    return { ...shared, ...local, rules: { ...shared.rules, ...local.rules } };
 }
 
 export function resourcePlan(root, adapter) {
@@ -56,9 +67,7 @@ export function resourcePlan(root, adapter) {
         output.set(prefix + '/standards/' + name, readFileSync(join(toolkitRoot, 'standards', name), 'utf8'));
     }
 
-    const pint = JSON.parse(readFileSync(join(toolkitRoot, 'config/pint.json'), 'utf8'));
-    const local = adapter.quality?.pint ?? {};
-    output.set(prefix + '/pint.json', JSON.stringify({ ...pint, ...local, rules: { ...pint.rules, ...local.rules } }, null, 4) + '\n');
+    output.set(prefix + '/pint.json', JSON.stringify(pintSettings(adapter), null, 4) + '\n');
     const configurationDirectory = resolve(root, prefix);
     const portable = (path) => relative(configurationDirectory, path).replaceAll('\\', '/');
     const quote = (value) => JSON.stringify(value);
@@ -208,7 +217,7 @@ function syncAdapterFile(root, name, { remove, check }) {
     if (adapter) assertPrerequisites(root, adapter);
 
     const policy = prior === null
-        ? { $schema: './vendor/svchk-dev/ai-devkit/config/adapter.schema.json', schemaVersion: 1 }
+        ? { $schema: './vendor/svchk-dev/ai-devkit/config/adapter.schema.json', schemaVersion: 1, stateDirectory: 'vendor/.ai-devkit' }
         : JSON.parse(prior);
     const packagePath = 'vendor/svchk-dev/ai-devkit/';
     const sourceIdentity = toolkitIdentity();
@@ -219,7 +228,7 @@ function syncAdapterFile(root, name, { remove, check }) {
         skills: packagePath + 'resources/boost/skills/',
     };
 
-    if (adapter?.profiles.includes('codex')) toolkit.hooks = packagePath + 'adapters/codex/hooks.json';
+    if (adapter?.profiles.includes('codex')) toolkit.hooks = packagePath + 'adapters/codex/plugin-hooks.json';
 
     const changed = JSON.stringify(policy.toolkit) !== JSON.stringify(toolkit);
 

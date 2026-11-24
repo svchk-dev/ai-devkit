@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, realpathSync, lstatSync } from 'node:fs';
-import { resolve, relative, isAbsolute, sep, dirname } from 'node:path';
+import { resolve, relative, isAbsolute, sep, dirname, join } from 'node:path';
 
 export const profiles = ['laravel-application', 'laravel-package', 'filament', 'openspec', 'codex'];
 
@@ -61,6 +61,16 @@ export function adapterName(root) {
     return legacy ? 'devkit.json' : null;
 }
 
+export function selectsCodexPlugin(root) {
+    const path = join(root, '.devkit');
+
+    if (!lstatSync(path, { throwIfNoEntry: false })?.isFile()) return false;
+
+    const { profiles } = JSON.parse(readFileSync(path, 'utf8'));
+
+    return Array.isArray(profiles) && profiles.includes('codex');
+}
+
 export function readAdapter(root) {
     const name = adapterName(root);
 
@@ -111,10 +121,6 @@ export function readAdapter(root) {
         throw new Error('The .devkit adapter reads shared resources from the installed package.');
     }
 
-    if (name === '.devkit' && Object.keys(adapter.quality ?? {}).length) {
-        throw new Error('Move quality settings to the project Pint and PHPStan configurations before adopting .devkit.');
-    }
-
     adapter.stateDirectory ??= 'tmp/devkit';
     containedPath(root, adapter.stateDirectory);
     adapter.architecture ??= { mode: 'areas' };
@@ -152,16 +158,31 @@ export function readAdapter(root) {
     };
 
     knownKeys(adapter.architecture, ['mode', 'rules', 'command', 'additionalAreas', 'compositionRoots'], 'architecture');
-    knownKeys(adapter.quality ?? {}, ['pint', 'phpstan'], 'quality');
+    knownKeys(adapter.quality ?? {}, ['php', 'pint', 'phpstan'], 'quality');
+    if (adapter.quality?.php !== undefined) command(adapter.quality.php);
     object(adapter.quality?.pint ?? {}, 'Pint settings');
-    knownKeys(adapter.quality?.phpstan ?? {}, ['level', 'bootstrapFiles', 'excludePaths'], 'PHPStan');
+    knownKeys(adapter.quality?.phpstan ?? {}, [
+        'level', 'phpVersion', 'paths', 'includes', 'bootstrapFiles', 'excludePaths', 'configDirectories', 'databaseMigrationsPath',
+    ], 'PHPStan');
     const phpstan = adapter.quality?.phpstan ?? {};
 
     if (phpstan.level !== undefined && (!Number.isInteger(phpstan.level) || phpstan.level < 0 || phpstan.level > 10)) throw new Error('Invalid PHPStan level.');
 
-    for (const key of ['bootstrapFiles', 'excludePaths']) {
+    if (phpstan.phpVersion !== undefined && (!Number.isInteger(phpstan.phpVersion) || phpstan.phpVersion < 1)) {
+        throw new Error('PHPStan phpVersion must be a positive PHP version identifier.');
+    }
+
+    for (const key of ['paths', 'includes', 'bootstrapFiles', 'excludePaths', 'configDirectories', 'databaseMigrationsPath']) {
         if (phpstan[key] !== undefined && !Array.isArray(phpstan[key])) throw new Error('PHPStan paths must be arrays.');
         for (const name of phpstan[key] ?? []) containedPath(root, name);
+    }
+
+    if (adapter.quality?.pint?.['cache-file'] !== undefined) containedPath(root, adapter.quality.pint['cache-file']);
+    if (name === '.devkit' && adapter.quality?.pint?.in !== undefined) {
+        if (!Array.isArray(adapter.quality.pint.in) || !adapter.quality.pint.in.length) throw new Error('Pint in must be a nonempty path array.');
+        for (const path of adapter.quality.pint.in) {
+            if (path !== '.') containedPath(root, path);
+        }
     }
 
     knownKeys(adapter.inputSets ?? {}, ['implementationGuidance'], 'inputSets');

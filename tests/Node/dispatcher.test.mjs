@@ -40,15 +40,20 @@ test('ordinary tools return before repository discovery, client inventory or sca
 });
 
 test('edit preflight supplies guidance without client inventory or a repository snapshot', async (context) => {
-    const root = await fixture(context);
+    const root = await fixture(context, {
+        '.ai/rules/src.md': 'Use project source guidance.\n',
+        '.devkit/standards/coding.md': 'Use the shared coding standards.\n',
+    });
     symlinkSync('/etc/hosts', join(root, 'unsupported-input.php'));
     const marker = unavailableClient(context, root);
 
     const result = await handleEvent(event(root, 'PreToolUse', {
-        tool_name: 'apply_patch', tool_input: { command: '*** Add File: src/Example.php' },
+        tool_name: 'apply_patch', tool_input: { command: '*** Add File: ' + join(root, 'src', 'Example.php') },
     }));
 
     assert.match(result.hookSpecificOutput.additionalContext, /AGENTS\.md/u);
+    assert.match(result.hookSpecificOutput.additionalContext, /\.ai\/rules\/src\.md/u);
+    assert.match(result.hookSpecificOutput.additionalContext, /standards\/coding\.md/u);
     assert.equal(existsSync(marker), false);
 });
 

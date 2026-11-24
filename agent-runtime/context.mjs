@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { toolkitRoot } from './resources.mjs';
 import { digest } from './repository.mjs';
 import { readAdapter, containedPath } from './adapter.mjs';
+import { agentCommand, nativeEditPaths } from './protocol.mjs';
 
 function specificationReferences(root, directory) {
     const path = containedPath(root, directory);
@@ -18,8 +19,10 @@ export function projectContext(root, state, event, task) {
     const adapter = readAdapter(root);
     const references = ['AGENTS.md', ...(adapter.references ?? []), ...(adapter.reviewer?.references ?? [])];
     const standards = ['index.md', 'rule-ownership.md'];
+    const editPaths = event.hook_event_name === 'PreToolUse' ? nativeEditPaths(root, event) : [];
+    const paths = [...(task?.paths ?? []), ...editPaths];
 
-    if (task && task.profile !== 'docs') standards.push('coding.md');
+    if ((task && task.profile !== 'docs') || editPaths.some((path) => /\.(?:php|mjs|js|ts|css|scss|vue)$/u.test(path))) standards.push('coding.md');
     if (adapter.resourceDirectory) references.push(...standards.map((name) => adapter.resourceDirectory + '/standards/' + name));
     if (adapter.architecture.mode === 'custom') references.push(adapter.architecture.rules);
     if (task?.change && adapter.profiles.includes('openspec')) {
@@ -30,7 +33,7 @@ export function projectContext(root, state, event, task) {
         references.push(...specs.map((path) => path.replace('openspec/changes/' + task.change + '/specs/', 'openspec/specs/')));
     }
     for (const entry of adapter.specializedReferences ?? []) {
-        if (task?.paths.some((path) => path === entry.path || path.startsWith(entry.path + '/') || entry.path.startsWith(path + '/'))) references.push(...entry.references);
+        if (paths.some((path) => path === entry.path || path.startsWith(entry.path + '/') || entry.path.startsWith(path + '/'))) references.push(...entry.references);
     }
 
     const available = [...new Set(references)].filter((path) => existsSync(containedPath(root, path)));
@@ -51,9 +54,10 @@ export function projectContext(root, state, event, task) {
 
     const summary = task
         ? 'Current task: ' + task.id + '; mode: ' + task.mode + '; profile: ' + task.profile + '; scope: ' + task.paths.join(', ') + '. Task metadata does not expand user authorization.'
-        : 'No active task is registered. Register authorized scope before editing. Runtime session: ' + state.sessionId + '.';
+        : `No active task is registered. Run ${agentCommand} start with the authorized scope and the current --session before editing. Runtime session: ${state.sessionId}.`;
 
     return ['AI Devkit context:', summary, 'Read current project sources: ' + contents.map(([path]) => path).join(', ') + '.',
+        'Read the applicable toolkit skill at ' + join(toolkitRoot, 'resources/boost/skills') + '.',
         'Code tasks require the full coding standards and all applicable specialized standards. Delivered references do not prove reading or comprehension.',
         'Before recording a rule, explain its owner: reusable defaults belong in AI Devkit source; business rules and deliberate exceptions stay local. Never edit installed/generated toolkit resources or silently duplicate shared defaults.',
         'Use actual checks and completed independent review. Preserve unrelated edits.'].join('\n');

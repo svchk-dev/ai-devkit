@@ -247,9 +247,9 @@ test('refreshes reporting and review without re-executing an unchanged runtime s
     assert.equal(await reviewIsCurrent(root, activeTask(state)), false);
     const missing = await completionRequirements(root, state, activeTask(state));
 
-    assert.ok(missing.some((message) => message.includes('current docs check')));
+    assert.ok(missing.some((message) => message.includes('check --check docs')));
     assert.ok(missing.some((message) => message.includes('independent project review')));
-    assert.ok(missing.every((message) => !message.includes('current full check')));
+    assert.ok(missing.every((message) => !message.includes('check --check full')));
 
     await reviewedTask(root);
     await requestCheckpoint(root, 'session-a', 'complete');
@@ -271,7 +271,9 @@ test('completes observed receipt and checkbox recording with documentation valid
 
     assert.equal(await reviewIsCurrent(root, activeTask(state)), true);
     assert.equal((await currentReceipts(root, state, activeTask(state))).full.id, full.id);
-    assert.deepEqual(await completionRequirements(root, state, activeTask(state)), ['Run the current docs check through make agent-check.']);
+    assert.deepEqual(await completionRequirements(root, state, activeTask(state)), [
+        'Run node vendor/svchk-dev/ai-devkit/agent-runtime/cli.mjs check --check docs with the current --session.',
+    ]);
 
     assert.equal((await runCheck(root, 'session-a', 'docs')).outcome, 'passed');
     await requestCheckpoint(root, 'session-a', 'complete');
@@ -435,7 +437,7 @@ test('credits actual successful checks and rejects stale receipts after an unobs
     await requestCheckpoint(root, 'session-a', 'complete');
     const output = await handleEvent(event(root, 'Stop'));
 
-    assert.match(output.reason, /current docs check/u);
+    assert.match(output.reason, /agent-runtime\/cli\.mjs check --check docs/u);
     await assert.rejects(runCheck(root, 'session-a', 'echo passed'), /arbitrary commands/u);
 });
 

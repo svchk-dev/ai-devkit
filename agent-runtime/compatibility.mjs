@@ -1,10 +1,12 @@
-import { execFile, spawn } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import { parseArgs, promisify } from 'node:util';
 import { pathToFileURL } from 'node:url';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { coveragePolicyIdentity, repositoryRoot, snapshot } from './repository.mjs';
 import { readState, stateDirectory } from './state.mjs';
+import { projectIsTrusted, requestCodex } from '../adapters/codex/native-client.mjs';
+import { selectsCodexPlugin } from './adapter.mjs';
 
 const executeFile = promisify(execFile);
 const requiredEvents = ['sessionStart', 'userPromptSubmit', 'preToolUse', 'postToolUse', 'subagentStop', 'stop', 'interrupt'];
@@ -50,76 +52,27 @@ export async function observedClientCoverage(root, client) {
 }
 
 export async function inspectHooks(root, timeoutMs = 15000) {
-    return new Promise((resolve, reject) => {
-        const child = spawn('codex', ['app-server', '--stdio'], { cwd: root, stdio: ['pipe', 'pipe', 'ignore'] });
-        let buffered = '';
-        let settled = false;
-        const timeout = setTimeout(() => finish(new Error('Local Codex hook inventory timed out.')), timeoutMs);
-
-        function finish(error, result) {
-            if (settled) return;
-
-            settled = true;
-            clearTimeout(timeout);
-            child.stdin.end();
-            child.kill();
-            if (error) reject(error);
-            else resolve(result);
-        }
-
-        child.on('error', () => finish(new Error('Local Codex hook inventory is unavailable.')));
-        child.on('close', () => {
-            if (!settled) finish(new Error('Local Codex closed before returning its hook inventory.'));
-        });
-        child.stdin.on('error', () => finish(new Error('Local Codex hook inventory connection closed.')));
-        child.stdout.setEncoding('utf8');
-        child.stdout.on('data', (chunk) => {
-            buffered += chunk;
-
-            if (Buffer.byteLength(buffered) > 4 * 1024 * 1024) {
-                finish(new Error('Local Codex hook inventory exceeded its limit.'));
-                return;
-            }
-
-            let newline;
-
-            while ((newline = buffered.indexOf('\n')) !== -1) {
-                const line = buffered.slice(0, newline);
-                buffered = buffered.slice(newline + 1);
-                let message;
-
-                try { message = JSON.parse(line); } catch { finish(new Error('Local Codex returned an invalid protocol message.')); return; }
-
-                if (message.id === 1) {
-                    if (message.error) { finish(new Error('Local Codex initialization failed.')); return; }
-
-                    child.stdin.write(JSON.stringify({ method: 'initialized' }) + '\n');
-                    child.stdin.write(JSON.stringify({ id: 2, method: 'hooks/list', params: { cwds: [root] } }) + '\n');
-                }
-
-                if (message.id === 2) {
-                    if (message.error) finish(new Error('Installed Codex does not provide a usable hooks/list operation.'));
-                    else finish(null, message.result);
-                }
-            }
-        });
-
-        child.stdin.write(JSON.stringify({ id: 1, method: 'initialize', params: {
-            clientInfo: { name: 'devkit-hook-rehearsal', version: '1.0.0' }, capabilities: { experimentalApi: true },
-        } }) + '\n');
-    });
+    return requestCodex(root, 'hooks/list', { cwds: [root] }, timeoutMs);
 }
 
 export function activationStatus(root, inventory) {
     const entries = inventory.data ?? [];
     const entry = entries.find((candidate) => candidate.cwd === root);
-    const hooks = entry?.hooks.filter((hook) => hook.source === 'project' && hook.sourcePath === root + '/.codex/hooks.json') ?? [];
-    const missing = requiredEvents.filter((eventName) => !hooks.some((hook) => hook.eventName === eventName
-        && hook.enabled && ['trusted', 'managed'].includes(hook.trustStatus)));
+    const hooks = entry?.hooks.filter((hook) => (hook.source === 'project' && hook.sourcePath === root + '/.codex/hooks.json')
+        || (hook.source === 'plugin' && hook.pluginId?.split('@')[0] === 'ai-devkit'
+            && hook.command?.includes('/adapters/codex/plugin.mjs'))) ?? [];
+    const activeHooks = hooks.filter((hook) => hook.enabled && ['trusted', 'managed'].includes(hook.trustStatus));
+    const missing = requiredEvents.filter((eventName) => !activeHooks.some((hook) => hook.eventName === eventName));
+    const errors = (entry?.errors ?? []).map((error) => error.message);
+
+    if (new Set(activeHooks.map((hook) => hook.source)).size > 1) {
+        errors.push('AI Devkit is active in both project and client hooks. Select one source.');
+    }
 
     return {
-        active: missing.length === 0 && !entry?.errors.length,
-        missing, errors: (entry?.errors ?? []).map((error) => error.message),
+        active: missing.length === 0 && errors.length === 0,
+        source: activeHooks[0]?.source ?? null,
+        missing, errors,
         hooks: hooks.map((hook) => ({ event: hook.eventName, enabled: hook.enabled, trust: hook.trustStatus, hash: hook.currentHash })),
     };
 }
@@ -129,7 +82,20 @@ export async function installedClientIdentity(root, timeoutMs = 15000) {
         executeFile('codex', ['--version'], { timeout: Math.min(5000, timeoutMs) }), inspectHooks(root, timeoutMs),
     ]);
 
-    return { version: version.stdout.trim(), activation: activationStatus(root, inventory) };
+    const activation = activationStatus(root, inventory);
+
+    if (activation.active && activation.source === 'plugin') {
+        try {
+            if (!selectsCodexPlugin(root)) activation.errors.push('Select the codex profile in .devkit to enable this project.');
+            else if (!(await projectIsTrusted(root, timeoutMs))) activation.errors.push('Trust this project in Codex before enabling AI Devkit.');
+        } catch {
+            activation.errors.push('Cannot verify the project selection and trust for AI Devkit.');
+        }
+
+        activation.active = activation.errors.length === 0;
+    }
+
+    return { version: version.stdout.trim(), activation };
 }
 
 async function main() {

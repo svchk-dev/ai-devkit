@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## v0.3.0 (2026-11-25)
+
+- Add a shared Codex plugin for opted-in, trusted projects. It loads the
+  dispatcher from the AI Devkit package selected by each project's Composer lock.
+- Add package-owned Pint and PHPStan commands configured through `.devkit`.
+- Keep new single-file operational state under the ignored Composer directory.
+- Apply adapter-scoped references to native edits before they run.
+
 ## v0.2.0 (2026-11-24)
 
 - Add the single-file `.devkit` Composer setup. Explicit sync creates or

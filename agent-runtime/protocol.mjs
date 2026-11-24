@@ -1,7 +1,29 @@
+import { isAbsolute, relative, resolve, sep } from 'node:path';
+
 const supportedEvents = new Set([
     'SessionStart', 'UserPromptSubmit', 'PreToolUse', 'PostToolUse',
     'SubagentStop', 'Stop', 'Interrupt',
 ]);
+export const agentCommand = 'node vendor/svchk-dev/ai-devkit/agent-runtime/cli.mjs';
+
+export function nativeEditPaths(root, event, { deletions = true } = {}) {
+    if (!/(?:apply_patch|Edit|Write)$/u.test(event.tool_name ?? '')) return [];
+
+    const input = event.tool_input;
+    const command = typeof input === 'string' ? input : input?.command ?? input?.cmd;
+    const paths = [input?.file_path, input?.path];
+
+    if (typeof command === 'string') {
+        for (const [, operation, path] of command.matchAll(/^\*\*\* (Add File|Update File|Delete File|Move to): (.+)$/gmu)) {
+            if (deletions || operation !== 'Delete File') paths.push(path);
+        }
+    }
+
+    return paths.filter((path) => typeof path === 'string' && path && !path.includes('\0'))
+        .map((path) => relative(root, resolve(event.cwd, path)))
+        .filter((path) => path && path !== '..' && !path.startsWith('..' + sep) && !isAbsolute(path))
+        .map((path) => path.split(sep).join('/'));
+}
 
 export function parseEvent(text) {
     if (Buffer.byteLength(text, 'utf8') > 1024 * 1024) {
@@ -44,7 +66,7 @@ export function contextOutput(event, additionalContext) {
 
 export function failureOutput() {
     return {
-        systemMessage: 'Devkit hook failed; verification is incomplete. Run make agent-task status and inspect the local diagnostics. A failed hook does not prove that the client blocked the operation.',
+        systemMessage: `Devkit verification is incomplete. Run ${agentCommand} status with the current --session and inspect the local hook diagnostics.`,
     };
 }
 

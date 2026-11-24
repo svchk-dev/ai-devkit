@@ -79,7 +79,8 @@ export async function snapshot(root, select = () => true) {
 }
 
 export function coveragePolicyIdentity(inputs, client) {
-    return digest([process.version, toolkitIdentity(), client, inputs.files.filter(([path]) => path === '.devkit' || path === 'devkit.json' || path.startsWith('agent-runtime/') || path.startsWith('scripts/agent-hooks/')
-        || path.startsWith('tooling/phpstan/') || path.startsWith('.codex/')
-        || path === 'scripts/agent-conventions.php' || path === 'scripts/agent-tool-identity.php')]);
+    const policyInputs = inputs.files.filter(([path]) => ['.devkit', 'devkit.json', 'composer.json', 'composer.lock'].includes(path)
+        || /^(?:\.codex|agent-runtime|scripts|tooling)\//u.test(path));
+
+    return digest([process.version, toolkitIdentity(), client, policyInputs]);
 }

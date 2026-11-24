@@ -138,7 +138,11 @@ Run `vendor/bin/devkit.mjs sync` after installing or updating locked
 dependencies. It refreshes toolkit metadata and preserves local settings.
 Use `vendor/bin/devkit.mjs sync --check` to validate setup without writing.
 Composer installation does not run this command itself. Codex hook activation
-and trust are explicit client actions.
+and trust are explicit client actions. Install the shared Codex plugin once and
+select the `codex` profile in `.devkit` in each participating repository. The
+plugin loads the rules and hooks from the project's locked Composer package.
+Run `vendor/bin/devkit.mjs format` and `vendor/bin/devkit.mjs analyse` to apply
+the installed quality defaults and any overrides selected in `.devkit`.
 
 See the [adapter guide](docs/adapter.md) for settings and
 [installation, update and recovery](docs/usage.md) for the full workflow and
@@ -159,7 +163,7 @@ layout override, and a package booted through Testbench. Synthetic immutable
 Composer artifacts cover updates, saved-lock restoration, managed removal and an
 HTTP probe after runtime-only installation.
 
-The trusted Codex integration was exercised with actual lifecycle events,
+The project-local Codex integration was exercised with actual lifecycle events,
 including scope recovery, native and shell edits, delayed check completion,
 separate review, Stop feedback and interruption. See the
 [acceptance evidence](openspec/changes/archive/2026-11-24-initialize-laravel-devkit/evidence.md)

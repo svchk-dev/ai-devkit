@@ -17,21 +17,20 @@ An alternative uses mode custom, rules pointing to existing local documentation
 and command as a nonempty argv array for its verification.
 
 Use doctor to validate configuration and prerequisites. Use sync --check to
-verify the selected toolkit without writing. Point contributors to the
-installed standards index through the project's existing agent entry point
-or optional Boost discovery. The toolkit does not create agent entry points.
+verify the selected toolkit without writing. The Codex profile adds the shared
+standards and skill locations to the agent's context. Contributors can also
+follow `.devkit` metadata or optional Boost discovery.
 
 Projects with a root devkit.json keep the legacy managed output and
 devkit.resources.json ownership manifest. The optional resourceDirectory
 setting applies to that layout only. See the [migration guide](usage.md#migrate-a-legacy-snapshot)
 to move to the single-file adapter.
 
-In legacy snapshot mode, quality.pint supplies explicit local settings and
-exclusions merged over shared defaults. Document intentional exceptions locally. Paths must remain
-inside the repository after symlink resolution; commands are argv, not shell
-fragments. Failed writes restore previous files or report precise recovery paths.
-Operational state is separate and must be ignored; neither state nor manifests
-contain credentials or full transcripts.
+Document intentional exceptions locally. Paths must remain inside the repository
+after symlink resolution. Define commands as argv arrays. Failed writes restore
+previous files or report precise recovery paths. New `.devkit` files place
+operational state under `vendor/.ai-devkit`. For an existing `stateDirectory`,
+retain its ignored location and access to any active task evidence.
 
 The legacy ownership manifest also records the executing Composer selection when its
 installed path matches the toolkit being run. Direct source execution is labelled
@@ -39,16 +38,19 @@ development; a content digest is still recorded. The schema describes structure;
 runtime validation additionally checks symlinks, installed prerequisites and
 cross-field requirements.
 
-Single-file setups can use the [installed Pint preset](../config/pint.json)
-and include the [installed PHPStan defaults](../config/phpstan.neon) and
-[convention rules](../config/conventions.neon) from their existing configurations.
-They can run the installed `bin/conventions.php` with the active adapter settings.
-Keep command-specific Pint and PHPStan overrides in project configurations
-when using the single-file adapter. Legacy snapshots can generate effective
-configuration using the adapter's `quality` options.
-quality.phpstan can select level, bootstrapFiles and excludePaths. The consumer
-can include this file from its own Larastan configuration and retain its host
-bootstrap. Pint uses an effective JSON configuration; it has no native inheritance.
+Use `vendor/bin/devkit.mjs format --test` for read-only Pint and omit `--test`
+to apply formatting. It uses `sourceRoots` unless `quality.pint.in` or explicit
+CLI paths select a different scope. Set `quality.pint.in` to `["."]` for a
+repository-wide check that respects the configured exclusions.
+The command merges `quality.pint` over the [shared Pint
+preset](../config/pint.json). `vendor/bin/devkit.mjs analyse` runs PHPStan with
+the [shared analysis defaults](../config/phpstan.neon). Set `quality.phpstan`
+to select the analysis level, PHP version, paths, includes, bootstrap files or
+exclusions. Set `quality.php` to the project-relative execution argv prefix when
+PHP runs through a container command. The root project must be the working
+directory inside the container. The commands keep effective configuration in
+the state directory only while the tools run. Existing project configurations
+can independently include the installed [convention rules](../config/conventions.neon).
 
 Area architecture accepts additionalAreas and explicit fully qualified
 compositionRoots. Run vendor/bin/devkit.mjs architecture with Deptrac
@@ -60,18 +62,17 @@ names and business responsibility still require review. See
 [Deptrac configuration](https://deptrac.github.io/deptrac/configuration/) and
 [collectors](https://deptrac.github.io/deptrac/collectors/).
 
-The codex profile references the installed hook template from the managed
-metadata in `.devkit`. Legacy snapshots copy the templates to their managed
-directory. Activation is a separate local integration step. Review and merge
-the hook definitions
-into the consumer's own .codex/hooks.json, configure its project_reviewer role
-from the template and preserve local policy. Those local launchers remain
-consumer-owned; sync never overwrites them or grants trust. Use the client's
-supported trust interface yourself. Changing definitions or the executing
-toolkit requires a fresh actual rehearsal; synthetic tests are insufficient.
+The `codex` profile opts into the [shared client plugin](usage.md#enable-codex-hooks).
+Once installed, it uses Codex's project trust and verifies the installed package
+against the Composer lock and `.devkit` metadata before running it. The hook adds
+the project's installed standards, applicable skills and configured local
+references to the agent's context. Legacy snapshots still provide the
+project-local hook and reviewer templates.
 
-Run the installed agent-runtime/cli.mjs from project-owned commands for task
-registration, scope changes, declared checks, review preparation and checkpoints.
+Run the installed `agent-runtime/cli.mjs` directly for task registration, scope
+changes, declared checks, review preparation and checkpoints. Set `checks` and
+`verificationProfiles` in `.devkit` to describe the project's actual commands
+and required checks. These can invoke installed tools directly.
 Run agent-runtime/compatibility.mjs --inventory to inspect current client trust
 and observed coverage. Register the actual runtime session and do not manufacture
 lifecycle events. Unavailable hooks do not waive manual checks or review.

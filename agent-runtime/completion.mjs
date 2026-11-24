@@ -2,18 +2,19 @@ import { requiredChecks } from './checks.mjs';
 import { digest } from './repository.mjs';
 import { currentReceipts } from './runner.mjs';
 import { reviewIsCurrent } from './review.mjs';
+import { agentCommand } from './protocol.mjs';
 
 export async function completionRequirements(root, state, task) {
     const missing = [];
 
     if (task?.mode !== 'change') return missing;
-    if (task.scopeMissing || !task.paths.length) missing.push('Establish the actual authorized change scope and check profile with make agent-task scope.');
+    if (task.scopeMissing || !task.paths.length) missing.push(`Establish the actual authorized change scope and check profile with ${agentCommand} scope.`);
 
     const receipts = await currentReceipts(root, state, task);
 
     try {
         for (const checkId of requiredChecks(task, root)) {
-            if (!receipts[checkId]) missing.push(`Run the current ${checkId} check through make agent-check.`);
+            if (!receipts[checkId]) missing.push(`Run ${agentCommand} check --check ${checkId} with the current --session.`);
         }
     } catch (error) {
         missing.push(error.message);
@@ -34,7 +35,7 @@ export async function assessCompletion(root, state, task, event) {
         && checkpoint.generation === state.generation && checkpoint.inputHash === state.inputHash;
     const missing = [];
 
-    if (!valid) missing.push('Create a single-use checkpoint for this runtime turn and current task state with make agent-task.');
+    if (!valid) missing.push(`Create a single-use checkpoint for this runtime turn with ${agentCommand} checkpoint.`);
 
     if (valid && checkpoint.outcome !== 'complete') {
         task.lastHandoff = { outcome: checkpoint.outcome, reason: checkpoint.reason, turnId: event.turn_id };
