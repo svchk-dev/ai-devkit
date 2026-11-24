@@ -121,11 +121,16 @@ separate adapters; support for them is not currently claimed.
 ## How adoption works
 
 Install a compatible published version as a root Composer development dependency
-and commit the resolved lockfile. For the 0.1 series, use:
+and commit the resolved lockfile. For a direct install of the 0.1 series from the
+public GitHub repository, run:
 
 ```sh
+composer config repositories.ai-devkit vcs https://github.com/svchk-dev/ai-devkit
 composer require --dev svchk-dev/ai-devkit:^0.1
 ```
+
+When the package is available in your configured Composer registry, Composer
+can resolve it by name from that registry.
 
 Selected ecosystem tools remain explicit project dependencies. Resource
 preparation runs through the separate commands below.
@@ -212,3 +217,5 @@ repository's own OpenSpec workflow and receive separate independent review.
 AI Devkit uses the [MIT license](LICENSE). See
 [source provenance](docs/provenance.md) and
 [third-party notices](THIRD_PARTY_NOTICES).
+Maintainers use the [release policy](docs/releases.md) to verify and publish
+version tags.

@@ -26,16 +26,17 @@ without acquiring another product's domain rules or production infrastructure.
   adapter as separate consumers.
 - Prepare for public Git hosting and Composer distribution with an explicit
   license/provenance inventory and confidentiality review before publication.
+- Give maintainers an agent-led release procedure that selects and verifies an
+  immutable version when the owner authorizes sending package changes.
 
-The reusable toolkit and independent consumers are confirmed scope. Public
-distribution is the recommended target from the user's latest question, not
-authorization to publish. The project is named AI Devkit; its package identity is
-`svchk-dev/ai-devkit`. MIT is the proposed license for original contributions;
-license confirmation and destination selection are publication prerequisites.
+The reusable toolkit and independent consumers are confirmed scope. The
+public distribution target is AI Devkit under MIT with package identity
+`svchk-dev/ai-devkit`. Each publication follows the owner's authorization
+and the public-source review.
 
 Non-goals are product-domain functionality, a site starter, production deployment,
-monitoring, content automation, a hosted agent service and automatic GitHub or
-Packagist publication. Direct development-tool calls are clearer than Laravel
+monitoring, content automation, a hosted agent service and unattended publication
+without maintainer authorization. Direct development-tool calls are clearer than Laravel
 events: no application-domain producer or concrete subscriber is introduced.
 
 Shared-rule changes belong to AI Devkit's source repository; consumer business

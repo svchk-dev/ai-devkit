@@ -155,6 +155,29 @@ discussion MUST NOT itself trigger remote creation or publication.
 - **WHEN** public hosting or package distribution is discussed without an instruction to publish
 - **THEN** work remains local and no remote repository, package registration or release is created
 
+### Requirement: Agent-led toolkit versioning
+
+Repository agent instructions SHALL direct the agent to establish release impact
+from the full unreleased package diff and to maintain the changelog. Composer
+versions SHALL come from immutable annotated semantic version tags.
+
+#### Scenario: Publish package-impacting updates
+
+- **WHEN** the owner authorizes a maintainer push that includes a package release
+- **THEN** the agent selects the smallest compatible unused version from the remote tag baseline and full unreleased change set
+- **AND** the agent verifies the exact public candidate, creates and pushes its annotated tag and checks a fresh locked Composer install without requesting a separate tag action
+
+#### Scenario: Maintain the repository without publishing a new version
+
+- **WHEN** the agent only prepares work locally, is authorized for a branch-only push, or finds that the unreleased changes have no package impact
+- **THEN** the agent retains pending release notes where relevant and creates no new release tag
+
+#### Scenario: Fail a release gate
+
+- **WHEN** required evidence fails, the source changes, or a conflicting tag exists
+- **THEN** the agent stops the affected release and preserves every published tag
+- **AND** a post-tag failure is reported with the published source identity and failed check
+
 ### Requirement: Default feature-first area architecture
 
 The shared architecture SHALL default to feature-first shared business and

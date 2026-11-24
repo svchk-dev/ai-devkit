@@ -43,9 +43,11 @@
 
 ## 6. Complete local acceptance and public-readiness review
 
-- [ ] 6.1 Review the prospective public file set, dependency provenance, export archive and repository history for confidential or restricted material; record automated scan scope and human assessment, and verify no unresolved redistribution/confidentiality findings.
+- [x] 6.1 Review the prospective public file set, dependency provenance, export archive and repository history for confidential or restricted material; record automated scan scope and human assessment, and verify no unresolved redistribution/confidentiality findings.
 - [x] 6.2 Document compatibility, installation/update/removal/recovery and release prerequisites, marking proposed identity/license and unpublished status accurately; verify links, command examples and strict OpenSpec validation.
-- [ ] 6.3 Obtain separate independent review of implementation, consumer evidence and the publication-readiness assessment; correct findings and verify affected checks and a current passed final review.
+- [x] 6.3 Obtain separate independent review of implementation, consumer evidence and the publication-readiness assessment; correct findings and verify affected checks and a current passed final review.
+- [x] 6.4 Make maintainer versioning discoverable for every agent-assisted AI Devkit push; document changelog, version selection, branch-only scope and exact-candidate gates without adding the repository's release policy to consumer instructions or skill discovery.
+- [x] 6.5 Rehearse compatible, additive, breaking, maintenance-only, branch-only and blocked release decisions; verify annotated tag identity and collision handling with a disposable Git remote.
 
 ## Workflow follow-up
 

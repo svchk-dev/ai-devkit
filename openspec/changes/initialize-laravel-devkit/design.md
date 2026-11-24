@@ -194,6 +194,20 @@ Automated secret scans supplement human source review; a clean pattern scan alon
 cannot establish confidentiality or licensing. Actual public hosting, Packagist
 registration and tags remain outside local implementation authorization.
 
+### 8. Route authorized maintenance pushes through version selection
+
+Require the repository agent to review the full pending package diff and changelog
+before every authorized push. A compatible fix increments the patch, an additive
+change increments the minor, and a breaking change increments the minor in 0.x
+or major from 1.0. Pure repository-maintenance work needs no package tag.
+
+The repository entry point always routes release decisions to a maintainer skill.
+Where the authorized branch push includes a package release, the same operation
+covers choosing the version, verifying the exact public candidate, creating one
+annotated tag and confirming a fresh Composer installation. A branch-only or
+local-only scope stops earlier. Hosted checks run from the existing workflow.
+Consumer projects continue to own their own release policies.
+
 ## Risks / Trade-offs
 
 - Shared defaults become inflexible -> Explicit local architecture/policy overrides
@@ -221,8 +235,9 @@ registration and tags remain outside local implementation authorization.
    tested toolkit identity to the separate adopter change.
 4. Verify update, removal and saved-lock restoration, complete source/export
    review and obtain independent review with actual check evidence.
-5. Synchronize specifications and archive only completed implementation. A later
-   authorized publication can create the remote/package release.
+5. Rehearse maintainer version selection, exact-candidate verification and tagging
+   on a disposable Git remote. Synchronize specifications and archive only
+   completed implementation. Public release operations require authorization.
 
 Rollback restores a consumer's saved dependency set and managed resources while
 preserving its local rules, secrets, application data and evidence. Failed

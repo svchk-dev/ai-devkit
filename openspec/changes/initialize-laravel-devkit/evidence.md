@@ -106,6 +106,32 @@ workstation paths or forbidden export paths. Local Composer validation,
 the complete check suite and independent consumer tests passed on the
 implementation. Subsequent edits update release documentation and evidence.
 
-The owner selected public publication under MIT. The real Codex acceptance
-task is complete. Exact candidate review, hosted CI and tagged distribution
-are separate milestones.
+The owner selected public publication under MIT. The independent reviewer
+passed the exact public candidate `b7463ca0d2512d91ffaa991d4b24aa725a433c95`
+without outstanding source or confidentiality findings. [GitHub Actions run
+45465023335](https://github.com/svchk-dev/ai-devkit/actions/runs/45465023335)
+passed on that commit, including the independent consumers.
+
+The public annotated [v0.1.0 tag](https://github.com/svchk-dev/ai-devkit/tree/v0.1.0)
+peels to the verified commit. [Tag workflow run
+45465885371](https://github.com/svchk-dev/ai-devkit/actions/runs/45465885371)
+passed. A fresh Composer development installation using the public GitHub VCS
+source resolved `v0.1.0` and recorded that exact reference. Packagist indexing
+was pending when the direct install was verified.
+
+## Maintainer release procedure
+
+A disposable repository and local bare remote exercised the documented Git
+steps. A local-only candidate and a branch-only push left the new release tag
+absent. The authorized rehearsal tag was annotated and peeled to the same
+commit locally and remotely. A conflicting tag attempt preserved the published
+object. The simulated blocked candidate left its next version unused. These
+operations verify Git mechanics. The rehearsal did not run hosted CI or
+perform external package publication.
+
+With Git configured to follow tags, explicit branch and tag pushes excluded
+another eligible local tag. Source and exported Markdown checks, strict
+OpenSpec validation and the release skill validator passed. An independent
+review walked through patch, minor, breaking and maintenance decisions and
+passed the corrected policy and publication records. This maintenance change
+does not warrant advancing the package version.

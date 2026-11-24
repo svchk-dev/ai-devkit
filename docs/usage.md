@@ -88,8 +88,6 @@ executing a mutating operation.
 
 ## Publication prerequisites
 
-Confirm license and publication destination, freeze the exact candidate, review
-source provenance and public files/history, pass maintained local checks and
-independent review, and obtain the required actual client/hosted evidence.
-Public hosting, tags and package registration need explicit authorization.
-Local artifacts and compatibility inventory do not establish a public release.
+Maintainers follow the [AI Devkit release policy](releases.md) for version
+selection, authorization, public-source review and exact-candidate verification.
+The policy governs this repository. Consumers own their release procedures.

@@ -23,8 +23,13 @@ between planned, implemented and verified behavior when reporting progress.
 - Before completing repository-changing work, obtain a separate independent
   review of the actual final scope and verification. Reviewers must not edit
   files or launch agents.
-- Keep work local until the user explicitly authorizes the intended push or
-  publication. Do not create remotes, tags or public packages from a discussion
-  about public distribution alone.
+- Before finishing package-impacting changes or pushing AI Devkit, apply the
+  [AI Devkit release policy](docs/releases.md) and load the `ai-devkit-release`
+  skill from `.agents/skills/ai-devkit-release/SKILL.md` in a source checkout.
+  Maintain pending release notes for package changes. After the owner
+  authorizes the intended push, own version selection and any required
+  annotated tag through a verified Composer installation. Honor an explicit
+  branch-only limit. Keep local work local until the owner authorizes a push
+  or publication.
 - Use project-local pinned tooling when it is established. Do not silently use or
   upgrade globally installed tools.
