@@ -1,12 +1,12 @@
 # Local implementation evidence
 
-Date: 2026-11-24. This records local implementation and checks, not a public
-release or completed real-client acceptance. The selected project/package name
-is AI Devkit / svchk-dev/ai-devkit. The original change id is retained.
+Date: 2026-11-24. This records local implementation checks, trusted
+Codex acceptance and review of the prospective public file set. Release and
+hosted CI results are recorded separately.
 
 ## Scope and identity
 
-The source checkout has baseline da6e869af35d7ffc1437fa765b93ef0f9607947e
+The initial local implementation used baseline da6e869af35d7ffc1437fa765b93ef0f9607947e
 (an empty local commit). Owned source includes standards, configuration, tools,
 adapters, skills, isolated tests, documentation and this change. Generated upstream
 skills, local IDE files, dependencies and operational state are separate owners.
@@ -36,31 +36,19 @@ Artifact checksums:
 - 0.1.0: 7862a26690ffe17986e75c4b321729de0cff9726d2312c98261c955eeb1c620a.
 - 0.2.0: 89076568048ee9d5c3dc320fb58f5784cfec8cd9b58356100a7d2de040509c4c.
 
-## Public file boundary
+## Initial local export
 
 The reviewed synthetic export excludes IDE files, dependencies, operational
 state, tests and generated upstream skills. Automated checks found no matches
 for the selected private-project identifiers, workstation paths or credential
-patterns. Documentation was also validated after extraction. Reachable Git history
-contains only the empty baseline; no remote or published tag exists.
+patterns. Documentation was also validated after extraction. The original
+working checkout had only its empty baseline on the local main branch at this
+point. The selected publication history is separate.
 
 These checks supplement the independent source/provenance review. They do not
 certify a future publication commit: its exact selected files, licensing choice
 and hosted acceptance still require review. Local user-owned staged IDE files
 remain outside this source/publication scope.
-
-## Remaining acceptance
-
-Task progress is 25/28. The real trusted-client rehearsal (4.6), final public
-candidate readiness (6.1) and full final acceptance review (6.3) remain open.
-Actual Codex inventory is 0.166.0-alpha.6 with no active trusted hooks and no
-observed lifecycle events for this toolkit. An isolated application with actual
-installed definitions is prepared in ignored temporary storage; trust was not
-changed. Synthetic events and direct CLI checks do not substitute for this stage.
-
-Consumer integrations are separate changes. No proprietary consumer dependency,
-business contract, private access procedure or release policy is distributed here.
-No synchronization/archive or public distribution is claimed by this evidence.
 
 ## Independent review
 
@@ -71,8 +59,8 @@ proxy invocation and canonical Git-state paths were corrected with regressions.
 The final helper spacing finding was also corrected and reviewed again.
 
 The corrected local implementation received passed with zero unresolved findings.
-The whole change received incomplete because actual trusted-client acceptance
-and final public-candidate review remain open. Runtime and consumer results were
+The whole change received incomplete at that stage, pending real client
+acceptance and final public-candidate review. Runtime and consumer results were
 executed by the coordinator and independently checked against their logs; the
 reviewer did not mutate files or manufacture hook receipts.
 
@@ -102,3 +90,22 @@ compaction followed by a normal turn restored project context. The installed
 compatibility command exited 0 with no missing definition or unobserved
 required event. Operational state, raw tool output and transcripts are kept
 out of the distribution.
+
+## Publication candidate checks
+
+The prospective public branch starts from an independently prepared, clean
+root commit holding 103 selected files with public author metadata. It contains
+the generic toolkit sources and the upstream notices. Local IDE files,
+developer checkpoints, environment files, vendor dependencies and raw logs
+are outside its history. The Git export additionally omits development-only
+test and generator resources through export attributes.
+
+Gitleaks 8.30.1 reported no findings in the candidate history when run offline.
+A separate path and content check found no private project identifiers,
+workstation paths or forbidden export paths. Local Composer validation,
+the complete check suite and independent consumer tests passed on the
+implementation. Subsequent edits update release documentation and evidence.
+
+The owner selected public publication under MIT. The real Codex acceptance
+task is complete. Exact candidate review, hosted CI and tagged distribution
+are separate milestones.

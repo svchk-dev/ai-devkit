@@ -34,7 +34,7 @@ reviewed export archive; a secret-pattern scan alone is insufficient.
 This ledger describes origins without importing a private repository inventory
 or naming any private consumer. The owner requested extraction of reusable
 development practices; no production implementation is transferred.
-Public distribution still requires confirmation of the license and review of the
-exact candidate, including all selected original/derived sources. Dependency
+The owner selected MIT for the public toolkit. Review each exact candidate,
+including all selected original and derived sources, before distribution. Dependency
 licenses remain with their separately installed packages. The
 [third-party notices](../THIRD_PARTY_NOTICES) retain the bundled generator notice.

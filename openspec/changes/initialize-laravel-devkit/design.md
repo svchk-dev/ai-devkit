@@ -229,8 +229,9 @@ preserving its local rules, secrets, application data and evidence. Failed
 synchronization retains the last usable state and actionable recovery. Toolkit
 updates have no application migration or database cleanup operation.
 
-## Open Questions
+## Publication target
 
-- Confirm the MIT license and publication destination before
-  preparing public metadata or distributing any candidate. Local implementation
-  and the generic acceptance matrix do not depend on the final names.
+The owner selected a public GitHub repository and a Composer package,
+svchk-dev/ai-devkit, under MIT. Review the exact public history, archive and
+provenance before distribution. Record hosted results separately from local
+acceptance.
