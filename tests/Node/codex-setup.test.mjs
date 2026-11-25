@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { delimiter, dirname, join } from 'node:path';
 import { test } from 'node:test';
@@ -171,6 +171,27 @@ test('Codex setup rejects an unexpected release identity before registering a ca
     assert.ok(setup.log().every(({ args }) => !args.includes('add')));
 });
 
+test('Codex setup uses a temporary path below an empty Git marker', (t) => {
+    const setup = fixture(t);
+    const project = setup.project('placeholder');
+    const temporaryRoot = join(dirname(project.root), 'temporary');
+    const temporaryDirectory = join(temporaryRoot, 'sessions');
+
+    mkdirSync(join(temporaryRoot, '.git'), { recursive: true });
+    mkdirSync(temporaryDirectory);
+
+    const installed = project.run('add-to-codex', { TMPDIR: temporaryDirectory });
+
+    assert.equal(installed.status, 0, installed.stderr);
+    assert.deepEqual(project.adapter().profiles, ['codex']);
+    const codexCalls = setup.log().filter(({ name }) => name === 'codex');
+    const canonicalTemporaryDirectory = realpathSync(temporaryDirectory);
+
+    assert.ok(codexCalls.length > 0);
+    assert.ok(codexCalls.every(({ cwd }) => dirname(cwd) === canonicalTemporaryDirectory));
+    assert.deepEqual(readdirSync(temporaryDirectory), []);
+});
+
 test('Codex setup keeps the user profile and subprocess working directory outside the project', (t) => {
     const setup = fixture(t);
     const project = setup.project('scope');
@@ -192,7 +213,10 @@ test('Codex setup keeps the user profile and subprocess working directory outsid
     assert.equal(redirectedCatalog.status, 1);
     assert.match(redirectedCatalog.stderr, /catalog directory must stay inside/u);
 
-    mkdirSync(join(dirname(project.root), '.git'));
+    const checkout = dirname(project.root);
+    const git = spawnSync('git', ['init', '--quiet', checkout], { encoding: 'utf8' });
+
+    assert.equal(git.status, 0, git.stderr);
 
     const nestedProject = project.run('add-to-codex');
 
@@ -201,4 +225,28 @@ test('Codex setup keeps the user profile and subprocess working directory outsid
     assert.deepEqual(project.adapter(), previous);
     assert.ok(!existsSync(join(setup.client, 'commands.jsonl')));
     assert.deepEqual(readdirSync(project.root).sort(), ['.devkit', 'composer.json', 'composer.lock', 'vendor']);
+});
+
+test('Codex setup refuses a separate checkout despite an empty nested Git marker', (t) => {
+    const setup = fixture(t);
+    const project = setup.project('consumer');
+    const previous = project.adapter();
+    const checkout = join(dirname(project.root), 'checkout');
+    const gitDirectory = checkout + '-metadata';
+    const git = spawnSync('git', [
+        'init', '--quiet', '--separate-git-dir=' + gitDirectory, checkout,
+    ], { encoding: 'utf8' });
+
+    assert.equal(git.status, 0, git.stderr);
+
+    const temporaryDirectory = join(checkout, 'temporary');
+
+    mkdirSync(join(temporaryDirectory, '.git'), { recursive: true });
+
+    const result = project.run('add-to-codex', { TMPDIR: temporaryDirectory });
+
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /temporary directory must be outside/u);
+    assert.deepEqual(project.adapter(), previous);
+    assert.ok(!existsSync(setup.client));
 });

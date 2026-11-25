@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync } from 'node:fs';
+import { existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync } from 'node:fs';
 import { homedir, tmpdir } from 'node:os';
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { adapterName, containedPath } from '../../agent-runtime/adapter.mjs';
@@ -39,15 +39,18 @@ function canonicalLocation(path) {
 function checkoutRoot(path) {
     let directory = path;
 
-    while (!existsSync(join(directory, '.git'))) {
+    while (true) {
+        const marker = join(directory, '.git');
+        const entry = lstatSync(marker, { throwIfNoEntry: false });
+
+        if (entry && (!entry.isDirectory() || readdirSync(marker).length > 0)) return directory;
+
         const parent = dirname(directory);
 
         if (parent === directory) return null;
 
         directory = parent;
     }
-
-    return directory;
 }
 
 function includesPath(parent, target) {

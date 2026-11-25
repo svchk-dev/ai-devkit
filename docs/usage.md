@@ -36,12 +36,16 @@ After syncing `.devkit` at the Git repository root, run:
 vendor/bin/devkit.mjs add-to-codex
 ```
 
-Keep `codex` and Git on PATH and keep the Codex profile and temporary directory
-outside the project checkout. The command reuses the configured marketplace
-and an enabled plugin. On first setup it verifies the published Git tag against
-the project's Composer lock and registers an exported catalog in the local
-Codex configuration. It then adds `codex` to the project's `.devkit`. After an
-installation error, correct the reported problem and rerun the command.
+Keep `codex` and Git on PATH and keep the Codex profile outside the project
+checkout. Setup uses a temporary directory outside both the project and any Git
+checkout. If the default path is unsuitable, set `TMPDIR` to an existing
+directory in that scope.
+
+The command reuses the configured marketplace and an enabled plugin. On first
+setup it verifies the published Git tag against the project's Composer lock and
+registers an exported catalog in the local Codex configuration. It then adds
+`codex` to the project's `.devkit`. After an installation error, correct the
+reported problem and rerun the command.
 
 Trust the repository in Codex and review and approve the plugin hooks under
 **Settings → Hooks** in the desktop app or `/hooks` in the CLI. Start a new

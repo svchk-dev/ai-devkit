@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## v0.5.1 (2026-11-25)
+
+- Allow `add-to-codex` to use temporary directories below an empty `.git`
+  placeholder while continuing to reject paths inside a Git checkout.
+
 ## v0.5.0 (2026-11-25)
 
 - Add `vendor/bin/devkit.mjs add-to-codex` to install or reuse the shared
