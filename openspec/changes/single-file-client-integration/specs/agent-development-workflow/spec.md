@@ -25,6 +25,42 @@ Dispatch MUST require verified native project trust and toolkit identity.
 - **WHEN** a Codex event belongs to a project without the `codex` profile in `.devkit`
 - **THEN** the shared hook skips it without taking project actions
 
+### Requirement: Explicit shared Codex setup
+
+The toolkit SHALL expose an explicit command to install or reuse its shared
+Codex plugin and opt in the current single-file consumer. The command MUST
+preserve existing user-level marketplace selection and native trust controls.
+
+#### Scenario: Set up a new Codex client from a synchronized project
+
+- **WHEN** a consumer explicitly runs `add-to-codex` with a published toolkit installed from its lock
+- **THEN** the toolkit registers a client-level catalog from the verified release using Codex commands and installs the shared plugin
+- **AND** only the project's existing `.devkit` is updated to select the `codex` profile
+
+#### Scenario: Reuse a client or retry setup
+
+- **WHEN** a consumer runs the command with an existing client marketplace or enabled plugin
+- **THEN** setup preserves the marketplace and reuses the enabled plugin when available
+- **AND** a failed Codex installation does not enable the project profile
+- **AND** trust of the repository and plugin hooks remains explicit in Codex
+
+### Requirement: Reusable OpenSpec publication guidance
+
+The toolkit SHALL distribute a shared OpenSpec sync, archive and push skill
+through the Codex plugin and Composer skill resources. The skill SHALL use the
+selected project's OpenSpec workflows, verification and publication policy.
+
+#### Scenario: Discover the skill through the shared client plugin
+
+- **WHEN** a consumer opens a session with the AI Devkit client plugin installed
+- **THEN** the shared publication skill is available without a project skill file
+
+#### Scenario: Apply project authorization and publication policy
+
+- **WHEN** the agent uses the skill for a selected OpenSpec change
+- **THEN** it follows the project's verification, specification, archive and release requirements
+- **AND** it requires explicit authorization for the intended remote changes
+
 ### Requirement: Consumer-declared verification paths
 
 The toolkit SHALL accept additional executable or runtime asset paths from the

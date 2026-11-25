@@ -26,7 +26,31 @@ Preserve the existing project-local hook template. The compatibility inventory
 must distinguish the client plugin and project sources and must report native
 trust and lifecycle evidence only when observed. The shared reviewer template
 can be registered at user scope once. Core business guidance is declared by each
-project. The installer and sync do not edit Codex settings or grant trust.
+project. Composer installation and sync do not change Codex settings.
+
+## Explicit Codex setup
+
+Expose `add-to-codex` after sync. Verify the project's locked and installed
+toolkit and single-file adapter before changing the Codex client. Reuse a
+configured marketplace and any enabled AI Devkit plugin at user scope. On
+first setup, export the published tagged source selected by the Composer lock
+into a persistent client catalog without Git metadata. Verify the tag against
+the locked source reference. Register the catalog and install the plugin using
+Codex's CLI outside the consumer checkout.
+
+After a successful client setup, add `codex` through the existing atomic
+adapter refresh. Keep other settings and leave a failed setup retryable.
+Project and hook trust remain actions in Codex. Existing manual setup and
+Composer-only updates remain available.
+
+## Shared OpenSpec publication skill
+
+Keep one maintained `openspec-push-changes` instruction file in the Composer
+skill directory and reference it from the Codex plugin manifest. The skill
+selects the intended OpenSpec work, reconciles its specifications and preserves
+the project's verification, archive and publication order. It delegates
+release decisions to the project's own policy and requires explicit user push
+authorization. No project-level skill file or publication script is required.
 
 ## Consumer verification paths
 

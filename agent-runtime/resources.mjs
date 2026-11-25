@@ -205,7 +205,7 @@ function applyFiles(root, adapter, files, paths, manifest) {
     } finally { rmSync(staging, { recursive: true, force: true }); }
 }
 
-function syncAdapterFile(root, name, { remove, check }) {
+function syncAdapterFile(root, name, { remove, check, enableCodex }) {
     if (remove) throw new Error('The .devkit configuration is project-owned. Remove it explicitly after reviewing its local settings.');
     if (existsSync(containedPath(root, manifestName))) throw new Error('Remove the legacy resource snapshot before creating .devkit.');
     if (!existsSync(containedPath(root, 'composer.json'))) throw new Error('Run sync from the root of your Composer project.');
@@ -219,6 +219,10 @@ function syncAdapterFile(root, name, { remove, check }) {
     const policy = prior === null
         ? { $schema: './vendor/svchk-dev/ai-devkit/config/adapter.schema.json', schemaVersion: 1, stateDirectory: 'vendor/.ai-devkit' }
         : JSON.parse(prior);
+    const profileChanged = enableCodex && !adapter.profiles.includes('codex');
+
+    if (profileChanged) policy.profiles = [...adapter.profiles, 'codex'];
+
     const packagePath = 'vendor/svchk-dev/ai-devkit/';
     const sourceIdentity = toolkitIdentity();
     const toolkit = {
@@ -228,9 +232,9 @@ function syncAdapterFile(root, name, { remove, check }) {
         skills: packagePath + 'resources/boost/skills/',
     };
 
-    if (adapter?.profiles.includes('codex')) toolkit.hooks = packagePath + 'adapters/codex/plugin-hooks.json';
+    if (policy.profiles?.includes('codex')) toolkit.hooks = packagePath + 'adapters/codex/plugin-hooks.json';
 
-    const changed = JSON.stringify(policy.toolkit) !== JSON.stringify(toolkit);
+    const changed = profileChanged || JSON.stringify(policy.toolkit) !== JSON.stringify(toolkit);
 
     if (!changed) return { changed: false, files: 1, sourceIdentity };
     if (check) throw new Error('The .devkit file is missing or its toolkit metadata is stale. Run vendor/bin/devkit.mjs sync.');
@@ -259,10 +263,11 @@ function syncAdapterFile(root, name, { remove, check }) {
     return { changed: true, files: 1, sourceIdentity };
 }
 
-export function synchronize(root, { remove = false, check = false } = {}) {
+export function synchronize(root, { remove = false, check = false, enableCodex = false } = {}) {
     const name = adapterName(root);
 
-    if (name !== 'devkit.json') return syncAdapterFile(root, name, { remove, check });
+    if (enableCodex && name !== '.devkit') throw new Error('Run sync to prepare a single-file .devkit before adding Codex.');
+    if (name !== 'devkit.json') return syncAdapterFile(root, name, { remove, check, enableCodex });
 
     const adapter = readAdapter(root);
 

@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## v0.5.0 (2026-11-25)
+
+- Add `vendor/bin/devkit.mjs add-to-codex` to install or reuse the shared
+  Codex plugin and opt the current project into its trusted hooks.
+- Bundle `openspec-push-changes` for Codex and Composer skill discovery. It
+  follows the current project's OpenSpec and release policy.
+
 ## v0.4.0 (2026-11-25)
 
 - Allow consumers to declare additional runtime verification paths in `.devkit`.

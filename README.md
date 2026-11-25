@@ -11,6 +11,38 @@ The Composer package is **svchk-dev/ai-devkit**, installed directly as a
 development dependency. See the [toolkit specification](openspec/specs/development-toolkit/spec.md)
 for the supported contract.
 
+## Quick start
+
+Run these commands from your project root:
+
+```sh
+composer require --dev svchk-dev/ai-devkit
+vendor/bin/devkit.mjs sync
+vendor/bin/devkit.mjs add-to-codex
+```
+
+Composer supplies shared standards, skills, and verification tools. Sync creates
+one configuration file, `.devkit`. Commit it with `composer.json` and
+`composer.lock` and keep project settings in `.devkit`.
+
+The third command is optional and enables Codex hooks for this project. Use
+the Git repository root for Codex hooks. The command
+installs the shared plugin in your local Codex configuration or reuses the
+existing installation, then adds `codex` to the project's `.devkit`. On first
+setup it uses the published release selected in `composer.lock`.
+
+Trust the repository and review the plugin hooks in **Settings → Hooks** in
+Codex desktop or `/hooks` in the CLI. Start a new session after approving them.
+
+After updating the Composer package, run `vendor/bin/devkit.mjs sync`.
+Update the client plugin separately when the release instructions require it.
+See [Enable Codex hooks](docs/usage.md#enable-codex-hooks) for verification and
+manual setup on earlier releases.
+
+Use [the shared OpenSpec publication skill](docs/usage.md#publish-openspec-changes)
+to sync, archive and push completed OpenSpec work under the project's own release
+policy.
+
 ## Why it exists
 
 Copying an AGENTS.md file, a collection of skills and several quality scripts
@@ -137,10 +169,7 @@ the canonical source for shared rules and tools.
 Run `vendor/bin/devkit.mjs sync` after installing or updating locked
 dependencies. It refreshes toolkit metadata and preserves local settings.
 Use `vendor/bin/devkit.mjs sync --check` to validate setup without writing.
-Composer installation does not run this command itself. Codex hook activation
-and trust are explicit client actions. Install the shared Codex plugin once and
-select the `codex` profile in `.devkit` in each participating repository. The
-plugin loads the rules and hooks from the project's locked Composer package.
+Follow the [Codex setup](#quick-start) to enable hooks.
 Run `vendor/bin/devkit.mjs format` and `vendor/bin/devkit.mjs analyse` to apply
 the installed quality defaults and any overrides selected in `.devkit`.
 

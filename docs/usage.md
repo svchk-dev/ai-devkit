@@ -30,28 +30,70 @@ and [adapter guide](adapter.md).
 
 ## Enable Codex hooks
 
-Add the AI Devkit marketplace and plugin once per Codex installation. Select a
-published Git tag that contains the plugin and substitute it for `TAG` below.
-For local testing, pass the AI Devkit checkout path as the marketplace source.
+After syncing `.devkit` at the Git repository root, run:
 
 ```sh
-codex plugin marketplace add svchk-dev/ai-devkit --ref TAG
-codex plugin add ai-devkit@svchk-dev
+vendor/bin/devkit.mjs add-to-codex
 ```
 
-Review and trust the plugin hooks in Codex's `/hooks` interface. Trust each
-participating repository through Codex's project trust prompt. Add `codex` to
-the project's `.devkit` profiles, run `vendor/bin/devkit.mjs sync`, and start a
-new session to load the shared guidance. Keep `codex` and Node on the client
-PATH. A separate `project_reviewer` role can be installed once at user scope
-from the [reviewer template](../adapters/codex/project_reviewer.toml), or the
-project can supply its own role when its review contract requires one.
+Keep `codex` and Git on PATH and keep the Codex profile and temporary directory
+outside the project checkout. The command reuses the configured marketplace
+and an enabled plugin. On first setup it verifies the published Git tag against
+the project's Composer lock and registers an exported catalog in the local
+Codex configuration. It then adds `codex` to the project's `.devkit`. After an
+installation error, correct the reported problem and rerun the command.
+
+Trust the repository in Codex and review and approve the plugin hooks under
+**Settings → Hooks** in the desktop app or `/hooks` in the CLI. Start a new
+session after approving them. The plugin dispatches to the version in the
+current project's Composer lock.
 
 Run `node vendor/svchk-dev/ai-devkit/agent-runtime/compatibility.mjs --inventory`
 in the project to inspect native activation. When migrating existing project
 hooks, disable their duplicate definitions after checking the shared plugin's
 trust and behavior. Repeat the actual lifecycle rehearsal when the executing
 toolkit or hook definitions change.
+
+A separate `project_reviewer` role can be installed once at user scope from
+the [reviewer template](../adapters/codex/project_reviewer.toml), or the project
+can supply its own role when its review contract requires one.
+
+### Manual setup
+
+For a release without `add-to-codex` or an explicitly selected local catalog,
+add the AI Devkit marketplace and plugin once per Codex installation. Select a
+published Git tag containing the plugin and substitute it for `TAG` below.
+For a local catalog, pass its path to marketplace add.
+
+```sh
+codex plugin marketplace add svchk-dev/ai-devkit --ref TAG
+codex plugin add ai-devkit@svchk-dev
+```
+
+Add `codex` to `.devkit` profiles, rerun `vendor/bin/devkit.mjs sync`, and
+complete the trust and verification steps above.
+
+## Publish OpenSpec changes
+
+Select `ai-devkit:openspec-push-changes` in the Codex skill picker and name the
+change to publish. Consumers using Boost can discover the same package skill as
+`openspec-push-changes`. The skill follows the project's OpenSpec commands,
+required checks and release policy. A request to publish the selected work
+authorizes that push. Mentioning or inspecting the skill preserves read-only
+behavior.
+
+Existing Codex installations with a catalog pinned before this skill was
+bundled need a one-time client update. After installing the selected Composer
+release and syncing the project, replace the old client installation:
+
+```sh
+codex plugin remove ai-devkit@svchk-dev
+codex plugin marketplace remove svchk-dev
+vendor/bin/devkit.mjs add-to-codex
+```
+
+Review the updated hooks in Codex and start a new session. The updated client
+plugin supplies the skill to projects that use it.
 
 ## Update or restore a selected version
 

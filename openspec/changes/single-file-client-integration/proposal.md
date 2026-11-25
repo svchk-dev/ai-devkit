@@ -11,6 +11,11 @@ those entry points from AI Devkit so new projects can reuse the shared policy.
 - Run Pint and PHPStan from the installed package using `.devkit` settings.
 - Supply one reusable Codex integration that selects each trusted project's
   installed AI Devkit. Keep the existing native project template compatible.
+- Add an explicit Composer CLI command to prepare the shared Codex plugin
+  and select it in the current project.
+- Distribute a shared OpenSpec sync, archive and authorized push skill through
+  the client plugin and package skill discovery. Follow each project's
+  verification and release policy.
 - Deliver the installed standards, skill and reviewer references from the
   active project adapter while preserving client trust and local exceptions.
 

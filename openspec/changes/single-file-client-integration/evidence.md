@@ -45,3 +45,49 @@ Focused adapter and dispatcher tests passed after adding the optional
 a runtime fixture with a Markdown extension, while an independent documentation
 scope retains its documentation-only profile. The paths in these checks are
 fixture data supplied through the consumer adapter.
+
+## Composer command for Codex setup
+
+The candidate based on `72978c868d8794e7ada2beb6b48b63b0610796ee` passed
+`make check` with 114 Node tests, 12 PHP tests and 33 assertions, Pint,
+PHPStan, 41 Markdown files and three strict OpenSpec items. `make test-consumer`
+passed both application layouts and the independent Testbench package,
+including update, recovery and runtime-only installation. Focused setup tests
+covered reuse across projects, retry after plugin installation failure,
+release identity mismatch, and refusal of project-local setup directories.
+
+A Composer fixture installed the implementation candidate as a disposable
+artifact with the published `v0.4.0` bootstrap identity. The actual Codex CLI
+`0.166.0-alpha.6` installed the plugin in both an absent explicit profile and
+a fresh default profile. Repeating the command reused the plugin and left the
+project adapter unchanged. The consumer had the Composer manifest and lock
+and a single `.devkit` file outside Git metadata and installed dependencies.
+
+Approval in the native client remained explicit for both the repository and
+the seven hooks. Two inventories reported identical trusted fingerprints.
+A native session using a loopback fixture model recorded startup, prompt
+submission and Stop without hook failures. The independent review passed
+after verifying the fresh-profile handling, directory isolation and nested
+checkout refusal. The setup command was verified before its first public release.
+
+## Shared OpenSpec publication skill
+
+The settled candidate passed `make check` in an isolated source copy with
+114 Node tests, 12 PHP tests and 33 assertions, Pint, PHPStan and strict
+documentation and OpenSpec checks. `make test-consumer` found
+`openspec-push-changes` among the installed Composer package's Boost skills
+and passed the application and package scenarios.
+
+An isolated Codex CLI `0.166.0-alpha.6` listed exactly one enabled user-scope
+`ai-devkit:openspec-push-changes` entry from the installed plugin in a project
+without a local skill directory. A read-only native turn with a loopback
+fixture model received the selected skill, and the trusted plugin recorded
+startup, prompt submission and Stop without hook failures.
+
+An independent forward test used a disposable repository and local bare
+origin. It synced the selected delta, validated and archived the change, then
+pushed only the requested branch. A second case with no active change and
+`push.followTags=true` pushed only the intended README change and kept the
+annotated tag and unrelated file local. Repeating the scoped request was a
+no-op. The separate repository review cleared the resulting scope and
+authorization corrections. This evidence was recorded before publication.

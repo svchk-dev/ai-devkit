@@ -1,5 +1,6 @@
 {
   "name": "ai-devkit",
   "description": "Shared guidance and verification for AI Devkit projects",
+  "skills": "./resources/boost/skills/openspec-push-changes",
   "hooks": "./adapters/codex/plugin-hooks.json"
 }
