@@ -79,16 +79,6 @@ async function acquireLock(path) {
     return lock;
 }
 
-export async function withRepositoryLock(root, name, operation) {
-    const lock = await acquireLock(join(stateDirectory(root), `repository-${name}`));
-
-    try {
-        return await operation();
-    } finally {
-        rmSync(lock, { recursive: true });
-    }
-}
-
 export async function mutateState(root, sessionId, operation) {
     const path = statePath(root, sessionId);
     const lock = await acquireLock(path);

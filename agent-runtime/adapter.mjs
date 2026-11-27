@@ -77,7 +77,7 @@ export function readAdapter(root) {
     if (name === null) throw new Error('Run vendor/bin/devkit.mjs sync to create .devkit.');
 
     const adapter = JSON.parse(readFileSync(containedPath(root, name), 'utf8'));
-    const keys = ['$schema', 'schemaVersion', 'toolkit', 'profiles', 'namespace', 'sourceRoots', 'architecture', 'quality', 'checks', 'verificationProfiles', 'references', 'inputSets', 'environment', 'reviewer', 'stateDirectory', 'resourceDirectory', 'specializedReferences', 'objectiveRuleIdentifiers', 'openspec'];
+    const keys = ['$schema', 'schemaVersion', 'toolkit', 'profiles', 'namespace', 'sourceRoots', 'architecture', 'quality', 'checks', 'verificationProfiles', 'references', 'inputSets', 'environment', 'reviewer', 'stateDirectory', 'resourceDirectory', 'specializedReferences', 'objectiveRuleIdentifiers'];
 
     if (!adapter || Array.isArray(adapter) || adapter.schemaVersion !== 1 || Object.keys(adapter).some((key) => !keys.includes(key))) {
         throw new Error('Unsupported adapter schema or setting.');
@@ -85,7 +85,7 @@ export function readAdapter(root) {
 
     if (adapter.$schema !== undefined && typeof adapter.$schema !== 'string') throw new Error('Schema reference must be a string.');
 
-    for (const key of ['architecture', 'quality', 'checks', 'verificationProfiles', 'inputSets', 'environment', 'reviewer', 'openspec']) {
+    for (const key of ['architecture', 'quality', 'checks', 'verificationProfiles', 'inputSets', 'environment', 'reviewer']) {
         if (adapter[key] !== undefined && (!adapter[key] || typeof adapter[key] !== 'object' || Array.isArray(adapter[key]))) {
             throw new Error(key + ' must be an object.');
         }
@@ -230,7 +230,6 @@ export function readAdapter(root) {
 
         if (value !== undefined && (typeof value !== 'string' || !/^[A-Z_][A-Z0-9_]*$/u.test(value))) throw new Error('Invalid environment variable mapping.');
     }
-    if (adapter.openspec && (Object.keys(adapter.openspec).some((key) => key !== 'archiveFirst') || typeof adapter.openspec.archiveFirst !== 'boolean')) throw new Error('Invalid OpenSpec profile policy.');
     for (const entry of adapter.specializedReferences ?? []) {
         containedPath(root, entry.path);
 

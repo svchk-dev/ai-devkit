@@ -303,18 +303,6 @@
         "type": "string",
         "minLength": 1
       }
-    },
-    "openspec": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "archiveFirst": {
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "archiveFirst"
-      ]
     }
   },
   "required": [

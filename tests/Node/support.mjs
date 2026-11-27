@@ -19,7 +19,7 @@ export async function fixture(context, files = {}) {
     for (const [path, content] of Object.entries({
         '.gitignore': '/tmp/\n', 'AGENTS.md': 'Read current project rules.\n',
         'README.md': '# Fixture\n',
-        'devkit.json': JSON.stringify({ schemaVersion: 1, profiles: ['openspec'], openspec: { archiveFirst: true },
+        'devkit.json': JSON.stringify({ schemaVersion: 1, profiles: ['openspec'],
             references: ['docs/coding-standards.md', 'docs/development.md', '.ai/rules/index.md', '.ai/rules/general.md'],
             specializedReferences: [{ path: 'src', references: ['.ai/rules/src.md'] }, { path: 'src/Admin', references: ['docs/admin-interface.md'] }],
             inputSets: { implementationGuidance: ['docs/coding-standards.md', 'docs/development.md', 'docs/ui-style.md'] },

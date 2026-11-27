@@ -6,7 +6,7 @@ const supportedEvents = new Set([
 ]);
 export const agentCommand = 'node vendor/svchk-dev/ai-devkit/agent-runtime/cli.mjs';
 
-export function nativeEditPaths(root, event, { deletions = true } = {}) {
+export function nativeEditPaths(root, event) {
     if (!/(?:apply_patch|Edit|Write)$/u.test(event.tool_name ?? '')) return [];
 
     const input = event.tool_input;
@@ -14,8 +14,8 @@ export function nativeEditPaths(root, event, { deletions = true } = {}) {
     const paths = [input?.file_path, input?.path];
 
     if (typeof command === 'string') {
-        for (const [, operation, path] of command.matchAll(/^\*\*\* (Add File|Update File|Delete File|Move to): (.+)$/gmu)) {
-            if (deletions || operation !== 'Delete File') paths.push(path);
+        for (const [, path] of command.matchAll(/^\*\*\* (?:Add File|Update File|Delete File|Move to): (.+)$/gmu)) {
+            paths.push(path);
         }
     }
 

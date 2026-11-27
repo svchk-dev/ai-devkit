@@ -25,7 +25,7 @@ reviewed export archive; a secret-pattern scan alone is insufficient.
 | src/PHPStan/* | Owner-authored convention tooling, generalized to consumer namespaces and explicit architecture policy |
 | agent-runtime/checks.mjs, context.mjs, environment.mjs, repository.mjs | Owner-authored workflow mechanisms with adapter-owned commands, paths and executed-toolkit identity |
 | agent-runtime/state.mjs, tasks.mjs, runner.mjs, review.mjs, completion.mjs | Owner-authored evidence/state/reviewer mechanisms; no product release or business policy |
-| agent-runtime/compatibility.mjs, dispatcher.mjs, protocol.mjs, proposals.mjs, watch.mjs, conventions.mjs, cli.mjs | Owner-authored generic client/workflow mechanisms; generated lifecycle evidence is excluded |
+| agent-runtime/compatibility.mjs, dispatcher.mjs, protocol.mjs, watch.mjs, conventions.mjs, cli.mjs | Owner-authored generic client/workflow mechanisms; generated lifecycle evidence is excluded |
 | agent-runtime/adapter.mjs, resources.mjs, toolkit-watch.mjs, architecture.mjs | Original toolkit integrations |
 | config/*, bin/*, adapters/*, resources/boost/* | Original shared configurations, entry points and distinctive templates/skills |
 | tests/*, tooling/*, Makefile, Dockerfile, manifests and CI | Owner-authored development/acceptance support with generic disposable fixtures |

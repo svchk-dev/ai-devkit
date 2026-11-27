@@ -405,19 +405,18 @@ test('requires a new checkpoint after progress and a subsequent edited turn', as
     assert.equal(activeTask(readState(root, 'session-a')).status, 'active');
 });
 
-test('isolates reviewer turns and Stop from the parent checkpoint and user proposal permission', async (context) => {
+test('isolates reviewer turns and Stop from the parent checkpoint', async (context) => {
     const root = await fixture(context);
     await startTask(root);
     const checkpoint = await requestCheckpoint(root, 'session-a', 'progress', 'Parent implementation continues.');
     const child = { agent_id: 'reviewer-a', agent_type: 'project_reviewer', turn_id: 'reviewer-turn' };
     await handleEvent(event(root, 'PreToolUse', { ...child, tool_name: 'Bash', tool_input: { command: 'git diff' } }));
-    await handleEvent(event(root, 'UserPromptSubmit', { ...child, prompt: 'allow-unarchived-proposal unrelated' }));
+    await handleEvent(event(root, 'UserPromptSubmit', { ...child, prompt: 'Review the current changes.' }));
 
     assert.deepEqual(await handleEvent(event(root, 'Stop', child)), {});
     const state = readState(root, 'session-a');
     assert.equal(state.turnId, 'turn-a');
     assert.equal(activeTask(state).checkpoint.id, checkpoint.id);
-    assert.equal(state.proposalGrant, undefined);
     assert.equal(state.coverage['Stop:subagent'], 1);
     assert.equal(state.coverage.Stop, undefined);
 

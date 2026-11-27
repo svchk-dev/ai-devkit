@@ -3,7 +3,6 @@ import { assessCompletion } from './completion.mjs';
 import { installedClientIdentity } from './compatibility.mjs';
 import { projectContext } from './context.mjs';
 import { agentCommand, contextOutput, failureOutput, readEvent } from './protocol.mjs';
-import { observeProposalPermission, proposalCreationTargets, proposalToolBlock, shellCommands } from './proposals.mjs';
 import { coveragePolicyIdentity, repositoryRoot, snapshot } from './repository.mjs';
 import { completeReviewer, observeReviewerInvocation, observeReviewerStatus } from './review.mjs';
 import { activeTask, isSubagentEvent, mutateState, observeRuntime, readState } from './state.mjs';
@@ -29,6 +28,80 @@ const reviewerTools = new Set([
     'collaborationlist_agents', 'collaboration.list_agents', 'list_agents',
 ]);
 
+function shellCommands(source) {
+    const commands = [];
+    let words = [];
+    let word = '';
+    let quote = null;
+    let escaped = false;
+    let comment = false;
+    let writes = false;
+    const flushWord = () => { if (word) words.push(word); word = ''; };
+    const flushCommand = () => {
+        flushWord();
+        if (words.length) commands.push({ words, writes });
+        words = [];
+        writes = false;
+    };
+
+    for (const character of source) {
+        if (comment) {
+            if (character === '\n') { comment = false; flushCommand(); }
+
+            continue;
+        }
+
+        if (escaped) {
+            word += character;
+            escaped = false;
+
+            continue;
+        }
+
+        if (character === '\\' && quote !== "'") {
+            escaped = true;
+
+            continue;
+        }
+
+        if (quote) {
+            if (character === quote) quote = null;
+            else word += character;
+
+            continue;
+        }
+
+        if (character === '#' && !word) { comment = true; continue; }
+        if (character === "'" || character === '"') {
+            quote = character;
+
+            continue;
+        }
+
+        if (character === '>') writes = true;
+
+        if (/[;&|\n]/u.test(character)) {
+            flushCommand();
+
+            continue;
+        }
+
+        if (/\s/u.test(character)) {
+            flushWord();
+
+            continue;
+        }
+
+        word += character;
+    }
+
+    if (quote || escaped) return [];
+
+    flushCommand();
+
+    return commands;
+}
+
 function supportedWrite(event) {
     if (/(?:apply_patch|Edit|Write)$/u.test(event.tool_name ?? '')) return true;
     if (!/(?:Bash|exec_command)$/u.test(event.tool_name ?? '')) return false;
@@ -45,21 +118,13 @@ function supportedWrite(event) {
 export function relevantEvent(event) {
     if (!['PreToolUse', 'PostToolUse'].includes(event.hook_event_name)) return true;
     if (event.hook_event_name === 'PostToolUse' && reviewerTools.has(event.tool_name)) return true;
-    if (supportedWrite(event)) return true;
-    if (!/(?:Bash|exec_command)$/u.test(event.tool_name ?? '')) return false;
 
-    const input = event.tool_input;
-    const command = typeof input === 'string' ? input : input?.command ?? input?.cmd ?? '';
-
-    return typeof command === 'string' && proposalCreationTargets(command).length > 0;
+    return supportedWrite(event);
 }
 
 async function toolPreflight(root, event) {
     return mutateState(root, event.session_id, (state) => {
         observeRuntime(state, event, state.inputHash);
-        const reason = proposalToolBlock(root, state, event);
-
-        if (reason) return { hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'deny', permissionDecisionReason: reason } };
 
         return contextOutput(event, projectContext(root, state, event, activeTask(state)));
     });
@@ -85,7 +150,6 @@ export async function dispatchEvent(root, event, client) {
         const subagent = isSubagentEvent(event);
         const observation = observeRuntime(state, event, inputs.hash);
         const task = activeTask(state);
-        const proposalContext = subagent ? '' : observeProposalPermission(root, state, event);
 
         if (!task && previousHash && observation.changed) state.unregisteredChanges = true;
 
@@ -96,7 +160,7 @@ export async function dispatchEvent(root, event, client) {
         }
 
         if (event.hook_event_name === 'SessionStart' || event.hook_event_name === 'UserPromptSubmit') {
-            return contextOutput(event, [proposalContext, projectContext(root, state, event, task)].filter(Boolean).join('\n'));
+            return contextOutput(event, projectContext(root, state, event, task));
         }
 
         if (event.hook_event_name === 'Interrupt') {

@@ -27,9 +27,6 @@
     "docs/provenance.md",
     "standards/rule-ownership.md"
   ],
-  "openspec": {
-    "archiveFirst": true
-  },
   "inputSets": {
     "implementationGuidance": [
       "standards/coding.md",

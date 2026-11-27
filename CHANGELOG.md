@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## v0.6.0 (2026-11-27)
+
+- Create changes with the project's OpenSpec CLI. **Breaking adapter change.**
+  Keep `openspec` only as an entry in the adapter's `profiles` list, then run
+  `vendor/bin/devkit.mjs sync`.
+
 ## v0.5.1 (2026-11-25)
 
 - Allow `add-to-codex` to use temporary directories below an empty `.git`
